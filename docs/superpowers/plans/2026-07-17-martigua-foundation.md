@@ -102,8 +102,7 @@ martivent/
 
 Locks `AUTH_USER_MODEL` into the first migration. Nothing that touches the database may run before this task.
 
-**Progress:** Steps 1–4 complete. Continue at Step 5 (`backend/config/urls.py`,
-`backend/config/wsgi.py`, and `backend/manage.py`).
+**Progress:** Steps 1–5 complete. Continue at Step 6 (create the `accounts` app).
 
 **Files:**
 - Create: `backend/pyproject.toml`
@@ -289,7 +288,7 @@ TIME_ZONE = "Europe/Paris"
 LANGUAGE_CODE = "fr-fr"
 ```
 
-- [ ] **Step 5: Create `backend/config/urls.py`, `wsgi.py`, `manage.py`**
+- [x] **Step 5: Create `backend/config/urls.py`, `wsgi.py`, `manage.py`**
 
 `backend/config/urls.py`:
 ```python

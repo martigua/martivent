@@ -14,6 +14,8 @@ Copied verbatim from the approved spec. Every task's requirements implicitly inc
 
 - **Runtime dependencies, complete and closed list:** `django`, `djangorestframework`, `drf-spectacular`, `django-allauth`, `pydantic-settings`, `whitenoise`, `psycopg`, `gunicorn`. Dev-only: `pytest`, `pytest-django`, `ruff`. Adding any other runtime library requires an explicit decision; do not add one silently.
 - **Frontend:** Angular with signals, plain CSS. No UI kit, no state library, no CSS framework (no Angular Material, PrimeNG, Tailwind, Bootstrap, NgRx).
+- **Mobile-first, responsive.** The site must be fully usable on phone and desktop. Author CSS mobile-first: base styles target the small screen, and `min-width` media queries layer on larger layouts (never `max-width` walk-backs). Every design-system component and page ships responsive; a viewport meta tag is present. Touch targets at least ~44px.
+- **Tooling:** dependencies and lockfile via `uv` (`uv sync`, `uv run`); `uv.lock` is committed. No pip/requirements.txt.
 - **Design tokens are two-tier.** Tier 1 = primitives (raw hex). Tier 2 = semantic (`var(--...)` of tier 1). **Components reference tier 2 only, never tier 1.**
 - **Fonts self-hosted** via `@font-face` (Bebas Neue display, Inter body). Never the Google Fonts CDN (French GDPR exposure).
 - **Disabled feature returns HTTP 404, never 403.** Applies to both the DRF permission and the view decorator.
@@ -29,14 +31,17 @@ Copied verbatim from the approved spec. Every task's requirements implicitly inc
 
 ```
 martivent/
-├── pyproject.toml                 ruff + pytest config
-├── requirements.txt               runtime deps
-├── requirements-dev.txt           pytest, pytest-django, ruff
-├── Dockerfile                     multi-stage: node build -> python runtime
+├── Dockerfile.dev                 dev container image (python 3.13 + node 24 + uv + zsh)
+├── docker-compose.dev.yml         dev + db services for local work
+├── docker/dev/zshrc               dev shell config
+├── Dockerfile                     multi-stage prod: node build -> python runtime
 ├── docker-compose.yml             web + postgres:16 (prod parity, local)
 ├── railway.json                   Railway deploy config
+├── .gitignore
 ├── .github/workflows/ci.yml       ruff, pytest, ng build, ng test
 ├── backend/
+│   ├── pyproject.toml             Python deps (uv) + ruff/pytest config
+│   ├── uv.lock                    committed lockfile
 │   ├── manage.py
 │   ├── entrypoint.sh              migrate then gunicorn
 │   ├── config/

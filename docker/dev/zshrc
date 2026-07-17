@@ -1,0 +1,24 @@
+# Basic, self-contained zsh config for the dev container. No frameworks, no network.
+
+# History
+HISTFILE=~/.zsh_history
+HISTSIZE=10000
+SAVEHIST=10000
+setopt SHARE_HISTORY HIST_IGNORE_DUPS HIST_IGNORE_SPACE
+
+# Completion
+autoload -Uz compinit && compinit
+zstyle ':completion:*' menu select
+zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'   # case-insensitive
+
+# Git branch in the prompt (built into zsh via vcs_info, no plugins)
+autoload -Uz vcs_info
+precmd() { vcs_info }
+zstyle ':vcs_info:git:*' formats ' %F{yellow}(%b)%f'
+setopt PROMPT_SUBST
+PROMPT='%F{green}%n@martivent%f %F{blue}%~%f${vcs_info_msg_0_} %# '
+
+# Conveniences
+setopt AUTO_CD                        # `foo/` instead of `cd foo/`
+alias ll='ls -lah --color=auto'
+alias gs='git status'

@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+
+# Node / Angular
+node_modules/
+frontend/dist/
+.angular/
+
+# Django (build artifacts, never committed)
+backend/staticfiles/
+backend/spa/
+*.sqlite3
+
+# Local env overrides
+.env
+
+# uv.lock IS committed on purpose (reproducible installs) — do not ignore it.

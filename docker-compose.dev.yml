@@ -12,8 +12,8 @@ services:
     volumes:
       - .:/workspace            # your repo, live-mounted: edits on the host appear instantly inside
     ports:
-      - "8000:8000"             # Django, when you run it inside the container
-      - "4200:4200"             # Angular dev server
+      - "8001:8000"             # host:container — Django (host 8001; 8000 was taken)
+      - "4201:4200"             # host:container — Angular dev server (host 4201; 4200 was taken)
     environment:
       DATABASE_URL: postgres://martivent:martivent@db:5432/martivent
     depends_on:
@@ -26,7 +26,7 @@ services:
       POSTGRES_USER: martivent
       POSTGRES_PASSWORD: martivent
     ports:
-      - "5432:5432"             # optional: reach the db from host tools too
+      - "5433:5432"             # host:container — optional host access (host 5433; 5432 often taken)
     volumes:
       - pgdata:/var/lib/postgresql/data   # named volume: data survives `down` and restarts
 

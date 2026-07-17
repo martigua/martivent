@@ -39,7 +39,7 @@ First run builds the image (a few minutes) and starts two containers:
 ### 2. Open a shell inside the container
 
 ```bash
-docker compose -f docker-compose.dev.yml exec dev bash
+docker compose -f docker-compose.dev.yml exec dev zsh
 ```
 
 You land in `/workspace`, which *is* your repo. Confirm the toolchain:
@@ -55,7 +55,10 @@ Run all project commands (Django, npm, migrations, tests) from this shell.
 > **Servers must bind to `0.0.0.0`, not `localhost`, inside the container**, or
 > the port mapping can't reach them from your host browser:
 > `manage.py runserver 0.0.0.0:8000`, `ng serve --host 0.0.0.0`.
-> Then open `http://localhost:8000` / `http://localhost:4200` on your host.
+> Then open `http://localhost:8001` (Django) / `http://localhost:4201` (Angular)
+> on your host. The servers still listen on 8000 / 4200 *inside* the container;
+> compose maps them to host ports 8001 / 4201 to avoid conflicts. Postgres is
+> likewise on host port 5433.
 
 ### 3. Stop
 

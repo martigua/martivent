@@ -181,17 +181,19 @@ scale.
 ```
 martivent/
 ├── backend/
+│   ├── pyproject.toml       Python deps (uv) + ruff/pytest config
+│   ├── uv.lock              committed lockfile
 │   ├── config/              settings, urls, wsgi
 │   ├── accounts/            User model, allauth config
 │   ├── features/            flags: model, evaluator, adapters, API
 │   └── manage.py
-├── frontend/                Angular workspace
+├── frontend/                Angular workspace (package.json, src/)
 │   ├── src/styles/          design tokens
 │   └── src/app/ui/          design-system components
 ├── docs/superpowers/specs/
-├── docker-compose.yml       local
+├── Dockerfile.dev           dev container (uv + node + zsh)
+├── docker-compose.dev.yml   local dev
 ├── Dockerfile               builds both, deploys to Railway
-├── pyproject.toml
 └── .github/workflows/ci.yml
 ```
 
@@ -326,6 +328,15 @@ without grepping every usage. It costs about 40 lines of CSS and zero libraries.
 Standalone Angular components with signals and scoped styles: `Button`
 (primary/secondary), `Card`, `Tag`, `SectionHeader` (eyebrow, title, lead),
 `StatBand`, `Modal`, `Toast`, `Avatar`, `FormField`.
+
+### Responsive (mobile-first)
+
+The site must be fully usable on phone and desktop. CSS is authored mobile-first:
+base rules target the small screen, and `min-width` media queries add larger
+layouts on top (no `max-width` walk-backs). Every component and page is built
+responsive from the outset, not retrofitted. A `viewport` meta tag is present and
+touch targets are at least ~44px. This is a club recruitment site — most visitors
+arrive on a phone, so the phone layout is the primary design target.
 
 ### Typography
 

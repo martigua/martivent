@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'drf_spectacular',
+    'accounts.apps.AccountsConfig',
 ]
 
 MIDDLEWARE = [
@@ -78,6 +79,8 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 DATABASES = {'default': env.database}
+
+AUTH_USER_MODEL = 'accounts.User'
 
 
 # Password validation

@@ -4,11 +4,13 @@ Website for **Martigua Sports Culture Loisirs**, a handball club in Paris 19e.
 
 Django + DRF backend, Angular frontend, one origin, deployed to Railway. Full
 design and rationale live in [`docs/superpowers/specs/`](docs/superpowers/specs/);
-the build plan is in [`docs/superpowers/plans/`](docs/superpowers/plans/).
+the active build plan is the
+[`Foundation guided execution plan`](docs/superpowers/plans/2026-07-17-martigua-foundation-guided.md).
 
 > **Status:** Foundation Task 1 is in progress. The development container and
 > backend dependencies, environment configuration, and Django settings are in
-> place. The custom user model, frontend, CI, and deployment follow.
+> place, along with the custom email-based user model. Tests, migrations,
+> frontend, CI, and deployment follow.
 
 ## Prerequisites
 

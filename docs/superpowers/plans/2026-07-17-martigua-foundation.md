@@ -1,5 +1,11 @@
 # Martigua Foundation Implementation Plan
 
+> **Superseded for execution:** This Claude-generated plan is retained as a
+> detailed design reference. Day-to-day work now follows the
+> [guided execution plan](2026-07-17-martigua-foundation-guided.md), which
+> separates framework-generated boilerplate from project-specific changes and
+> adds a user review gate after every small step.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Stand up a deployable Django + Angular skeleton — custom user, feature-flag mechanism, design system, one rendered page, CI, and Railway deploy — with no club features, so every later sub-project is just add-a-model-view-component to a working pipeline.
@@ -102,7 +108,8 @@ martivent/
 
 Locks `AUTH_USER_MODEL` into the first migration. Nothing that touches the database may run before this task.
 
-**Progress:** Steps 1–5 complete. Continue at Step 6 (create the `accounts` app).
+**Progress:** Steps 1–7 complete. Continue at Step 8 (create and inspect the
+custom-user migration before applying any migrations).
 
 **Files:**
 - Create: `backend/pyproject.toml`
@@ -201,9 +208,7 @@ INSTALLED_APPS = [
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
-    "allauth.socialaccount.providers.google",
     "accounts",
-    "features",
 ]
 
 MIDDLEWARE = [
@@ -255,16 +260,9 @@ REST_FRAMEWORK = {
 
 SPECTACULAR_SETTINGS = {"TITLE": "Martigua API", "VERSION": "0.1.0"}
 
-# allauth
+# allauth password authentication. Google provider registration ships in Task 5.
 ACCOUNT_LOGIN_METHODS = {"email"}
 ACCOUNT_SIGNUP_FIELDS = ["email*", "password1*", "password2*"]
-SOCIALACCOUNT_PROVIDERS = {
-    "google": {
-        "APP": {"client_id": env.google_client_id, "secret": env.google_secret, "key": ""},
-        "SCOPE": ["profile", "email"],
-        "OAUTH_PKCE_ENABLED": True,
-    }
-}
 LOGIN_REDIRECT_URL = "/"
 ACCOUNT_LOGOUT_REDIRECT_URL = "/"
 
@@ -329,7 +327,7 @@ if __name__ == "__main__":
     main()
 ```
 
-- [ ] **Step 6: Create the `accounts` app**
+- [x] **Step 6: Create the `accounts` app**
 
 `backend/accounts/__init__.py`: empty.
 
@@ -403,7 +401,7 @@ class CustomUserAdmin(UserAdmin):
     )
 ```
 
-- [ ] **Step 7: Write the failing test**
+- [x] **Step 7: Write the failing test**
 
 `backend/accounts/tests.py`:
 ```python
@@ -414,17 +412,21 @@ from django.contrib.auth import get_user_model
 @pytest.mark.django_db
 def test_user_uses_email_as_identifier():
     User = get_user_model()
-    u = User.objects.create_user(email="Coach@Martigua.fr", password="pw12345!")
-    assert u.email == "coach@martigua.fr"  # normalize_email lowercases the domain
-    assert u.get_username() == "coach@martigua.fr"
-    assert u.check_password("pw12345!")
+    user = User.objects.create_user(email="Coach@Martigua.fr", password="pw12345!")
+    assert user.email == "Coach@martigua.fr"  # normalize_email lowercases the domain
+    assert user.get_username() == "Coach@martigua.fr"
+    assert user.check_password("pw12345!")
 
 
 @pytest.mark.django_db
 def test_superuser_flags():
     User = get_user_model()
-    s = User.objects.create_superuser(email="admin@martigua.fr", password="pw12345!")
-    assert s.is_staff and s.is_superuser
+    superuser = User.objects.create_superuser(
+        email="admin@martigua.fr",
+        password="pw12345!",
+    )
+    assert superuser.is_staff
+    assert superuser.is_superuser
 ```
 
 - [ ] **Step 8: Create the first migration and verify the test fails first**
@@ -547,6 +549,7 @@ git commit -m "feat(foundation): healthz endpoint and OpenAPI schema route"
 
 **Files:**
 - Create: `backend/features/__init__.py`, `apps.py`, `models.py`, `flags.py`, `signals.py`, `admin.py`
+- Modify: `backend/config/settings.py`
 - Test: `backend/features/tests.py`
 
 **Interfaces:**
@@ -558,6 +561,9 @@ git commit -m "feat(foundation): healthz endpoint and OpenAPI schema route"
   - Cache auto-invalidated on `SectionVisibility` save/delete.
 
 - [ ] **Step 1: Create the app**
+
+Add `"features"` to `INSTALLED_APPS` in `backend/config/settings.py` as part of
+this step. It must not be registered before the package exists.
 
 `backend/features/__init__.py`: empty.
 
@@ -889,11 +895,11 @@ Google requires a Google Cloud Console OAuth client (consent screen, client ID/s
 
 **Files:**
 - Test: `backend/accounts/tests.py` (append)
-- Modify: none (allauth already installed and routed in Tasks 1-2)
+- Modify: `backend/config/settings.py`
 
 **Interfaces:**
 - Consumes: `accounts.User`, allauth URLs at `/accounts/`.
-- Produces: working `POST /accounts/login/` (field name `login`) and `POST /accounts/logout/`; Google provider registered (activation is operator-time via a `SocialApp` or the `SOCIALACCOUNT_PROVIDERS["google"]["APP"]` credentials already read from env in Task 1).
+- Produces: working `POST /accounts/login/` (field name `login`) and `POST /accounts/logout/`; Google provider registered after explicitly resolving its optional dependency set (activation is operator-time via a `SocialApp` or `SOCIALACCOUNT_PROVIDERS["google"]["APP"]` credentials).
 
 - [ ] **Step 1: Write the failing tests (append to `backend/accounts/tests.py`)**
 

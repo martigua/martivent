@@ -23,9 +23,7 @@ INSTALLED_APPS = [
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
-    "allauth.socialaccount.providers.google",
     "accounts",
-    "features",
 ]
 
 MIDDLEWARE = [
@@ -77,16 +75,9 @@ REST_FRAMEWORK = {
 
 SPECTACULAR_SETTINGS = {"TITLE": "Martigua API", "VERSION": "0.1.0"}
 
-# allauth
+# allauth password authentication. Google provider registration ships in Task 5.
 ACCOUNT_LOGIN_METHODS = {"email"}
 ACCOUNT_SIGNUP_FIELDS = ["email*", "password1*", "password2*"]
-SOCIALACCOUNT_PROVIDERS = {
-    "google": {
-        "APP": {"client_id": env.google_client_id, "secret": env.google_secret, "key": ""},
-        "SCOPE": ["profile", "email"],
-        "OAUTH_PKCE_ENABLED": True,
-    }
-}
 LOGIN_REDIRECT_URL = "/"
 ACCOUNT_LOGOUT_REDIRECT_URL = "/"
 

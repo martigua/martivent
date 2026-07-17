@@ -102,7 +102,8 @@ martivent/
 
 Locks `AUTH_USER_MODEL` into the first migration. Nothing that touches the database may run before this task.
 
-**Progress:** Steps 1–3 complete. Continue at Step 4 (`backend/config/settings.py`).
+**Progress:** Steps 1–4 complete. Continue at Step 5 (`backend/config/urls.py`,
+`backend/config/wsgi.py`, and `backend/manage.py`).
 
 **Files:**
 - Create: `backend/pyproject.toml`
@@ -173,7 +174,7 @@ class Env(BaseSettings):
 env = Env()  # built at import: a malformed env crashes boot instead of reading a silent default
 ```
 
-- [ ] **Step 4: Create `backend/config/settings.py`**
+- [x] **Step 4: Create `backend/config/settings.py`**
 
 ```python
 from pathlib import Path

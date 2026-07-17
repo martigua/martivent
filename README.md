@@ -7,8 +7,8 @@ design and rationale live in [`docs/superpowers/specs/`](docs/superpowers/specs/
 the build plan is in [`docs/superpowers/plans/`](docs/superpowers/plans/).
 
 > **Status:** Foundation Task 1 is in progress. The development container and
-> backend dependencies are set up, and environment configuration is complete.
-> Django settings, the custom user model, frontend, CI, and deployment follow.
+> backend dependencies, environment configuration, and Django settings are in
+> place. The custom user model, frontend, CI, and deployment follow.
 
 ## Prerequisites
 

@@ -78,11 +78,11 @@ The user runs from `/workspace/backend`:
 uv run django-admin startproject config .
 ```
 
-- [ ] User pastes the command output.
-- [ ] Agent inventories every generated file.
-- [ ] Agent explains every generated line, including Django defaults that will
+- [x] User pastes the command output.
+- [x] Agent inventories every generated file.
+- [x] Agent explains every generated line, including Django defaults that will
       later change.
-- [ ] User approves the untouched Django scaffold.
+- [x] User approves the untouched Django scaffold.
 
 Expected generated structure:
 
@@ -108,8 +108,8 @@ If the user wants a baseline check, the user runs:
 uv run python manage.py check
 ```
 
-- [ ] User pastes the result.
-- [ ] No migration is run.
+- [x] User pastes the result.
+- [x] No migration is run.
 - [ ] User decides whether the pristine scaffold is worth its own commit.
 
 ---

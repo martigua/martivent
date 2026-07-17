@@ -110,7 +110,7 @@ uv run python manage.py check
 
 - [x] User pastes the result.
 - [x] No migration is run.
-- [ ] User decides whether the pristine scaffold is worth its own commit.
+- [x] User decides whether the pristine scaffold is worth its own commit.
 
 ---
 
@@ -122,11 +122,38 @@ explains the exact diff, then stops.
 ### Gate 2.1: Add typed environment configuration
 
 - [ ] Create `backend/config/env.py`.
-- [ ] Add only application settings needed immediately: secret key, debug,
-      allowed hosts, and database URL.
+- [ ] Read Railway and Docker Compose process environment variables with
+      `pydantic-settings`; do not load a `.env` file.
+- [ ] Add only the application settings needed immediately: `SECRET_KEY`,
+      `DEBUG`, `ALLOWED_HOSTS`, and `DATABASE_URL`.
+- [ ] Use explicit development defaults. Injected values override them, and
+      malformed injected values fail validation at startup.
+- [ ] Keep `DATABASE_URL` unparsed until Gate 2.3.
 - [ ] Do not add feature flags or Google credentials yet; they belong to their
       own phases.
 - [ ] User reviews every line.
+
+Exact proposed file:
+
+```python
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+class Env(BaseSettings):
+    model_config = SettingsConfigDict(case_sensitive=False)
+
+    secret_key: str = "dev-insecure-do-not-use-in-production"
+    debug: bool = False
+    allowed_hosts: str = "localhost,127.0.0.1"
+    database_url: str = "postgresql://martivent:martivent@localhost:5432/martivent"
+
+    @property
+    def hosts(self) -> list[str]:
+        return [host.strip() for host in self.allowed_hosts.split(",") if host.strip()]
+
+
+env = Env()
+```
 
 ### Gate 2.2: Read core Django settings from the environment
 

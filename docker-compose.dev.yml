@@ -9,12 +9,18 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.dev
+      args:
+        DEV_UID: "${DEV_UID:-1000}"
+        DEV_GID: "${DEV_GID:-1000}"
     volumes:
       - .:/workspace            # your repo, live-mounted: edits on the host appear instantly inside
     ports:
       - "8001:8000"             # host:container — Django (host 8001; 8000 was taken)
       - "4201:4200"             # host:container — Angular dev server (host 4201; 4200 was taken)
     environment:
+      SECRET_KEY: dev-insecure-do-not-use-in-production
+      DEBUG: "true"
+      ALLOWED_HOSTS: localhost,127.0.0.1
       DATABASE_URL: postgres://martivent:martivent@db:5432/martivent
     depends_on:
       - db

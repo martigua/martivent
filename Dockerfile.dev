@@ -19,12 +19,19 @@ COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /usr/local/bin/
 # container fs — different filesystems, so hardlinks fail. Copy mode is correct here.
 ENV UV_LINK_MODE=copy
 
-# zsh as the interactive shell, with a small self-contained config (placed late so
-# editing the config doesn't invalidate the apt/node layers above).
-COPY docker/dev/zshrc /root/.zshrc
-RUN chsh -s /usr/bin/zsh root
+# Match the host user so files created in the bind-mounted workspace stay editable
+# from both the host and the container.
+ARG DEV_UID=1000
+ARG DEV_GID=1000
+RUN groupadd --gid "${DEV_GID}" dev \
+    && useradd --uid "${DEV_UID}" --gid "${DEV_GID}" \
+        --create-home --shell /usr/bin/zsh dev
+
+# zsh as the interactive shell, with a small self-contained config.
+COPY --chown=dev:dev docker/dev/zshrc /home/dev/.zshrc
 
 WORKDIR /workspace
+USER dev
 
 # No app process yet — keep the container alive so `docker compose exec` can attach.
 CMD ["sleep", "infinity"]

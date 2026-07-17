@@ -126,8 +126,9 @@ explains the exact diff, then stops.
       `pydantic-settings`; do not load a `.env` file.
 - [ ] Add only the application settings needed immediately: `SECRET_KEY`,
       `DEBUG`, `ALLOWED_HOSTS`, and `DATABASE_URL`.
-- [ ] Use explicit development defaults. Injected values override them, and
-      malformed injected values fail validation at startup.
+- [ ] Require all four variables in every environment. Docker Compose supplies
+      them locally and Railway supplies them in production.
+- [ ] Fail application startup when a required value is missing or malformed.
 - [ ] Keep `DATABASE_URL` unparsed until Gate 2.3.
 - [ ] Do not add feature flags or Google credentials yet; they belong to their
       own phases.
@@ -142,10 +143,10 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Env(BaseSettings):
     model_config = SettingsConfigDict(case_sensitive=False)
 
-    secret_key: str = "dev-insecure-do-not-use-in-production"
-    debug: bool = False
-    allowed_hosts: str = "localhost,127.0.0.1"
-    database_url: str = "postgresql://martivent:martivent@localhost:5432/martivent"
+    secret_key: str
+    debug: bool
+    allowed_hosts: str
+    database_url: str
 
     @property
     def hosts(self) -> list[str]:

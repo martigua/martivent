@@ -1,0 +1,17 @@
+# The Linux box we develop inside — same Debian base and language versions
+# as CI and production, so "works here" means "works in prod".
+FROM python:3.13-slim
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        git curl postgresql-client ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
+
+# Debian's packaged Node is too old for Angular; pull Node 24 (active LTS) from NodeSource.
+RUN curl -fsSL https://deb.nodesource.com/setup_24.x | bash - \
+    && apt-get install -y --no-install-recommends nodejs \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /workspace
+
+# No app process yet — keep the container alive so `docker compose exec` can attach.
+CMD ["sleep", "infinity"]

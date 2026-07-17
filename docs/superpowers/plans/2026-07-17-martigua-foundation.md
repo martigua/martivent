@@ -102,10 +102,11 @@ martivent/
 
 Locks `AUTH_USER_MODEL` into the first migration. Nothing that touches the database may run before this task.
 
+**Progress:** Steps 1–3 complete. Continue at Step 4 (`backend/config/settings.py`).
+
 **Files:**
-- Create: `pyproject.toml`
-- Create: `requirements.txt`
-- Create: `requirements-dev.txt`
+- Create: `backend/pyproject.toml`
+- Create: `backend/uv.lock`
 - Create: `backend/manage.py`
 - Create: `backend/config/__init__.py`, `backend/config/env.py`, `backend/config/settings.py`, `backend/config/urls.py`, `backend/config/wsgi.py`
 - Create: `backend/accounts/__init__.py`, `backend/accounts/apps.py`, `backend/accounts/models.py`, `backend/accounts/admin.py`
@@ -114,46 +115,19 @@ Locks `AUTH_USER_MODEL` into the first migration. Nothing that touches the datab
 **Interfaces:**
 - Produces: `accounts.models.User` (subclass of `AbstractUser`, `USERNAME_FIELD="email"`, `REQUIRED_FIELDS=[]`, manager method `create_user(email, password=None, **extra)` and `create_superuser(...)`). `config.env.Env` and `config.env.FeatureFlags` (nested pydantic model with field `selection: bool = False`), module-level `config.env.env` instance, `env.database` property returning a Django `DATABASES["default"]` dict.
 
-- [ ] **Step 1: Create dependency files**
+- [x] **Step 1: Create `backend/pyproject.toml`**
 
-`requirements.txt`:
-```
-Django>=5.2,<5.3
-djangorestframework>=3.15,<3.16
-drf-spectacular>=0.28,<0.29
-django-allauth>=65,<66
-pydantic-settings>=2.6,<3
-whitenoise>=6.8,<7
-psycopg[binary]>=3.2,<4
-gunicorn>=23,<24
-```
+Declare the closed runtime dependency list under `[project].dependencies`, the
+three development dependencies under `[dependency-groups].dev`, and the Ruff
+and pytest configuration. Set `[tool.uv] package = false` because the Django
+application runs from source and is not a distributable Python package.
 
-`requirements-dev.txt`:
-```
--r requirements.txt
-pytest>=8,<9
-pytest-django>=4.9,<5
-ruff>=0.8
-```
+- [x] **Step 2: Generate and commit `backend/uv.lock`**
 
-- [ ] **Step 2: Create `pyproject.toml` (tool config only, no packaging)**
+From `backend/`, run `uv sync` and commit the resulting lockfile. Do not create
+`requirements.txt` or `requirements-dev.txt`.
 
-```toml
-[tool.ruff]
-target-version = "py313"
-line-length = 100
-src = ["backend"]
-
-[tool.ruff.lint]
-select = ["E", "F", "I", "UP", "B"]
-
-[tool.pytest.ini_options]
-DJANGO_SETTINGS_MODULE = "config.settings"
-python_files = ["tests.py", "test_*.py"]
-pythonpath = ["backend"]
-```
-
-- [ ] **Step 3: Create `backend/config/env.py`**
+- [x] **Step 3: Create `backend/config/env.py`**
 
 ```python
 from urllib.parse import urlparse
@@ -174,7 +148,7 @@ class Env(BaseSettings):
     secret_key: str = "dev-insecure-do-not-use-in-prod"
     debug: bool = False
     allowed_hosts: str = "localhost,127.0.0.1"
-    database_url: str = "postgres://martivent:martivent@localhost:5432/martivent"
+    database_url: str = "postgres://martivent:martivent@db:5432/martivent"
     google_client_id: str = ""
     google_secret: str = ""
     features: FeatureFlags = FeatureFlags()
@@ -196,7 +170,7 @@ class Env(BaseSettings):
         return [h.strip() for h in self.allowed_hosts.split(",") if h.strip()]
 
 
-env = Env()  # constructed at import: a bad env crashes boot rather than reading a silent default
+env = Env()  # built at import: a malformed env crashes boot instead of reading a silent default
 ```
 
 - [ ] **Step 4: Create `backend/config/settings.py`**
@@ -1823,4 +1797,3 @@ All Foundation spec sections map to a task. Items the spec marks out-of-scope (1
 **3. Type consistency.** `is_enabled`/`all_flags`/`invalidate` names match across Tasks 3, 4, 8. `FeatureFlags`/`Env`/`env.database` match Tasks 1, 3, 4. `FlagsService.load`/`isEnabled`/`flags` match Tasks 7's service, nav, and spec test. `WHITENOISE_ROOT` is defined in Task 1 settings and read in Task 8's `spa.py`. The `feature_required`/`requires_feature` 404 behavior is stated once (Task 4) and noted as a deliberate refinement of the spec's `return is_enabled(key)` snippet, which would have produced 403.
 
 **One refinement flagged for you:** the spec's evaluator snippet has the DRF permission `return is_enabled(key)` (which yields 403 when off), but the spec's error-handling section mandates 404. Task 4 implements the 404 by raising `Http404` in the permission and decorator. That's the only place the plan intentionally diverges from a spec code sample, and it does so to satisfy a stronger spec rule.
-

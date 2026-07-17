@@ -6,9 +6,9 @@ Django + DRF backend, Angular frontend, one origin, deployed to Railway. Full
 design and rationale live in [`docs/superpowers/specs/`](docs/superpowers/specs/);
 the build plan is in [`docs/superpowers/plans/`](docs/superpowers/plans/).
 
-> **Status:** early setup. Right now the repo contains only the development
-> container. Backend, frontend, and deploy are built step by step; this README
-> grows as each lands.
+> **Status:** Foundation Task 1 is in progress. The development container and
+> backend dependencies are set up, and environment configuration is complete.
+> Django settings, the custom user model, frontend, CI, and deployment follow.
 
 ## Prerequisites
 

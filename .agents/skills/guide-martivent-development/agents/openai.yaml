@@ -1,4 +1,0 @@
-interface:
-  display_name: "Guided Martivent Development"
-  short_description: "Review-gated, line-by-line project workflow"
-  default_prompt: "Use $guide-martivent-development to make the next small Martivent change with a review gate."

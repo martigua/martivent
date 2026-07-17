@@ -66,9 +66,9 @@ No file is removed at this gate.
 
 ### Gate 1.2: Apply the approved cleanup
 
-- [ ] Agent removes only the files approved in Gate 1.1.
-- [ ] Agent shows the resulting diff and backend tree.
-- [ ] User approves the clean scaffold boundary.
+- [x] Agent removes only the files approved in Gate 1.1.
+- [x] Agent shows the resulting diff and backend tree.
+- [x] User approves the clean scaffold boundary.
 
 ### Gate 1.3: Generate the Django project
 

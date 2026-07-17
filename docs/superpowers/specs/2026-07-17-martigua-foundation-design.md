@@ -391,6 +391,19 @@ well-trodden.
 
 ## Local environment
 
+Application configuration follows Railway's runtime model. Railway service
+variables and Docker Compose both inject the same process environment variables:
+`SECRET_KEY`, `DEBUG`, `ALLOWED_HOSTS`, and `DATABASE_URL`. The application
+reads and type-checks them with `pydantic-settings`; it does not load a `.env`
+file. Railway's application service references the database service as
+`DATABASE_URL=${{Postgres.DATABASE_URL}}`.
+
+Explicit development defaults allow commands to run outside either container
+environment. Injected values always override those defaults, and malformed
+injected values fail validation during application startup. `ALLOWED_HOSTS` is
+accepted as a comma-separated string and exposed to Django as a cleaned list.
+The database URL remains unparsed until the database configuration consumes it.
+
 ```yaml
 # docker-compose.yml
 services:
@@ -416,9 +429,9 @@ Railway can still introduce.
 - **Validation failure:** DRF's standard 400 error shape. Custom endpoints using
   Pydantic catch `ValidationError` and return the same shape, so Angular has one
   error contract.
-- **Bad env config:** `pydantic-settings` fails at boot rather than silently
-  reading a default. A typo in `FEATURE_SELECTION` crashes the deploy instead of
-  quietly disabling the feature.
+- **Bad env config:** missing values use explicit development defaults, while
+  malformed injected values fail validation at boot instead of being silently
+  accepted.
 - **Unhandled exception:** Django returns 500. No error tracker in Foundation;
   `sentry-sdk` is a candidate later if it earns the dependency.
 

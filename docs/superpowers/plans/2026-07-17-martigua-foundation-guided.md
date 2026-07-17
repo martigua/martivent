@@ -56,11 +56,11 @@ the dependency baseline is being restarted.
 
 ### Gate 1.1: Review what will be kept and replaced
 
-- [ ] Agent shows the current backend tree, Git status, and relevant diffs.
-- [ ] Keep `backend/pyproject.toml` and `backend/uv.lock`.
-- [ ] Replace the hand-written/generated mixture under `backend/config/`,
+- [x] Agent shows the current backend tree, Git status, and relevant diffs.
+- [x] Keep `backend/pyproject.toml` and `backend/uv.lock`.
+- [x] Replace the hand-written/generated mixture under `backend/config/`,
       `backend/accounts/`, and `backend/manage.py`.
-- [ ] User approves the exact cleanup list.
+- [x] User approves the exact cleanup list.
 
 No file is removed at this gate.
 

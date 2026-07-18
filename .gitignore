@@ -1,21 +1,41 @@
-# Python
+# ── Python / Django / uv ────────────────────────────────────────────────
 __pycache__/
 *.py[cod]
+*.egg-info/
 .venv/
 .ruff_cache/
 .pytest_cache/
+.mypy_cache/
+htmlcov/
+.coverage
+.coverage.*
+coverage.xml
+backend/staticfiles/     # collectstatic output
+backend/spa/             # built Angular copied in for one-origin serving
+*.sqlite3
+# uv.lock IS committed on purpose (reproducible installs) — do not ignore it.
 
-# Node / Angular
+# ── Node / Angular ──────────────────────────────────────────────────────
 node_modules/
 frontend/dist/
 .angular/
+npm-debug.log*
+yarn-error.log*
+*.tsbuildinfo
 
-# Django (build artifacts, never committed)
-backend/staticfiles/
-backend/spa/
-*.sqlite3
-
-# Local env overrides
+# ── Environment / secrets ───────────────────────────────────────────────
 .env
+.env.*
+!.env.example
 
-# uv.lock IS committed on purpose (reproducible installs) — do not ignore it.
+# ── Editors / tooling ───────────────────────────────────────────────────
+# Neovim writes nvim.log into CWD when it can't reach its state dir.
+nvim.log
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# ── OS cruft ────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db

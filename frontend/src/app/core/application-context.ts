@@ -28,10 +28,4 @@ export class ApplicationContext {
   readonly context = computed(() =>
     this.contextResource.hasValue() ? this.contextResource.value() : null,
   );
-  readonly loading = this.contextResource.isLoading;
-  readonly error = this.contextResource.error;
-
-  reload(): void {
-    this.contextResource.reload();
-  }
 }

@@ -10,8 +10,10 @@ htmlcov/
 .coverage
 .coverage.*
 coverage.xml
-backend/staticfiles/     # collectstatic output
-backend/spa/             # built Angular copied in for one-origin serving
+# collectstatic output
+backend/staticfiles/
+# built Angular copied in for one-origin serving
+backend/spa/
 *.sqlite3
 # uv.lock IS committed on purpose (reproducible installs) — do not ignore it.
 

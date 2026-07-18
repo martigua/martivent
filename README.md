@@ -1,104 +1,67 @@
 # Martivent
 
-Website for **Martigua Sports Culture Loisirs**, a handball club in Paris 19e.
+Web application for **Martigua Sports Culture Loisirs**, a handball club in
+Paris 19e.
 
-Django + DRF backend, Angular frontend, one origin, deployed to Railway. Full
-design and rationale live in [`docs/superpowers/specs/`](docs/superpowers/specs/);
-the active build plan is the
-[`Foundation guided execution plan`](docs/superpowers/plans/2026-07-17-martigua-foundation-guided.md).
+The repository currently contains a Django REST backend with:
 
-> **Status:** Foundation Task 1 is in progress. The development container and
-> backend dependencies, environment configuration, and Django settings are in
-> place, along with the custom email-based user model. Tests, migrations,
-> frontend, CI, and deployment follow.
+- email-based user accounts;
+- additive, scoped authorization for users, roles, and organizational groups;
+- audience-based feature variants;
+- Django administration, PostgreSQL persistence, and an OpenAPI schema.
 
-## Prerequisites
+See [backend/README.md](backend/README.md) for the backend architecture and
+development reference.
 
-You only need these on your host machine:
+## Local setup
 
-- **Docker** and the **Docker Compose** plugin (`docker compose version` should work).
-
-Everything else — Python 3.13, Node 24, `psql`, git — lives *inside* the dev
-container. You never install them on your host.
-
-## Local development
-
-We develop inside a Linux container so your environment matches CI and
-production. You edit files with any editor on your host; the container sees them
-live through a bind mount.
-
-The dev shell (dotfiles/aliases) and the bundled Neovim config live in git
-submodules under `docker/dev/vendor/`. Clone with them, or pull them after the
-fact:
+The only host requirements are Git, Docker, and the Docker Compose plugin.
+Python, PostgreSQL, and the development tools run inside containers.
 
 ```bash
-git clone --recurse-submodules <repo-url>
-# or, in an existing checkout:
-git submodule update --init --recursive
-```
-
-Neovim (`nvim`) is preinstalled and preconfigured; the first launch bootstraps
-its plugins (one-time, needs network). Skipping the submodules is harmless — the
-aliases and nvim config simply won't be present.
-
-### 1. Start the environment
-
-```bash
+git clone --recurse-submodules git@github.com:martigua/martivent.git
+cd martivent
 docker compose -f docker-compose.dev.yml up -d --build
-```
-
-First run builds the image (a few minutes) and starts two containers:
-
-- `dev` — the Linux box you work in (Python 3.13, Node 24).
-- `db`  — Postgres 16, reachable from `dev` at host `db`, port `5432`.
-
-### 2. Open a shell inside the container
-
-```bash
 docker compose -f docker-compose.dev.yml exec dev fish
 ```
 
-The shell is **fish**, with a distinct orange `martivent` prompt badge so you
-always know you're inside the container. If you use the `marti` host shortcut
-(see below), just run `marti`.
-
-You land in `/workspace`, which *is* your repo. Confirm the toolchain:
+Inside the container:
 
 ```bash
-python --version   # Python 3.13.x
-node --version     # v24.x
-psql --version     # psql (PostgreSQL) 16.x
+cd /workspace/backend
+uv sync
+uv run python manage.py migrate
+uv run pre-commit install
+uv run python manage.py createsuperuser  # optional: access /admin/
+uv run python manage.py runserver 0.0.0.0:8000
 ```
 
-Run all project commands (Django, npm, migrations, tests) from this shell.
-`gh`, `rg` (ripgrep), `fd`, and `jq` are preinstalled. Your personal fish
-git-helper functions (`gaa`, `gc`, `gd`, …) come from the dotfiles submodule; the
-host-only bits (oh-my-fish, rustup) are intentionally not loaded. You run as the
-non-root `dev` user; for one-off tools use `sudo apt install <pkg>` — but note
-it's wiped on the next `--build`, so anything you want permanently belongs in
-`Dockerfile.dev`.
+The backend is available from the host at:
 
-**`marti` shortcut (optional):** a fish function in the dotfiles repo
-(`functions/marti.fish`) opens a container shell from anywhere on the host —
-`marti` for an interactive shell, `marti -c '<cmd>'` for a one-off. It ships in
-your dotfiles, so `git pull` that repo on the host to pick it up.
+- `http://localhost:8001/healthz`
+- `http://localhost:8001/admin/`
+- `http://localhost:8001/api/schema/`
 
-> **Servers must bind to `0.0.0.0`, not `localhost`, inside the container**, or
-> the port mapping can't reach them from your host browser:
-> `manage.py runserver 0.0.0.0:8000`, `ng serve --host 0.0.0.0`.
-> Then open `http://localhost:8001` (Django) / `http://localhost:4201` (Angular)
-> on your host. The servers still listen on 8000 / 4200 *inside* the container;
-> compose maps them to host ports 8001 / 4201 to avoid conflicts. Postgres is
-> likewise on host port 5433.
-
-### 3. Stop
+Run the backend checks from `/workspace/backend`:
 
 ```bash
-docker compose -f docker-compose.dev.yml down          # stop; keeps the database
-docker compose -f docker-compose.dev.yml down -v       # stop AND wipe the database volume
+uv run pytest
+uv run pre-commit run --all-files
 ```
 
-## Deployment
+Stop the environment with:
 
-Railway, from a Dockerfile. The deploy pipeline and its runbook land later
-(plan Task 10); this section fills in then.
+```bash
+docker compose -f docker-compose.dev.yml down
+```
+
+Add `-v` to also delete the local database volume.
+
+## Repository layout
+
+```text
+backend/                 Django REST backend
+docker/dev/              Development shell and editor configuration
+docker-compose.dev.yml   Development services and environment variables
+Dockerfile.dev           Reproducible development image
+```

@@ -19,16 +19,34 @@ The dev server is available at `http://localhost:4201/` and proxies `/api` and
 
 ## Architecture
 
+```
+src/app/
+  core/     singleton stores (ApplicationContext, CurrentUser)
+  layout/   application shell (nav)
+  pages/    routed pages (home)
+  ui/       reusable presentational components (mg-*)
+src/styles/ global design tokens, element defaults, typography, breakpoints
+```
+
 - `core/ApplicationContext` is the global read-only store for public
   backend-owned data from `GET /api/context/`.
 - `core/CurrentUser` is the global session store for the user, capability
   sources, and evaluated feature variants from `GET /api/me/`.
 - Backend checks are authoritative. Frontend gates improve navigation and UX
   but never replace backend authorization.
-- The landing page is eager. Add a lazy `loadChildren` route when a feature
-  becomes its own route area. Use `:id`, a nested `<router-outlet>`, and
-  component input binding when that feature has entity subpages.
+- The landing page is the only route and stays eager. Every new route area
+  loads with `loadChildren` so it stays out of the initial bundle;
+  `angular.json` enforces the initial-size budget. Use `:id`, a nested
+  `<router-outlet>`, and component input binding when a feature has entity
+  subpages.
 - New forms use Angular Signal Forms.
+
+## Dependencies
+
+Runtime dependencies are Angular, its required peers (`rxjs`, `tslib`), and
+self-hosted fonts. Before adding a library, prefer the platform or a small
+local implementation; a new runtime dependency needs a reason it cannot be
+either.
 
 ## Design system
 

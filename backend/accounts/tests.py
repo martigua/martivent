@@ -3,6 +3,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
 
 from access.models import Grant, OrganizationalGroup, Role, RoleAssignment
+from features.models import Feature, FeatureRule
 
 
 @pytest.mark.django_db
@@ -70,4 +71,32 @@ def test_me_returns_capabilities_with_independent_sources(client):
                 {"kind": "role", "name": "coach", "scope": "u18"},
             ],
         },
+        "features": {},
     }
+
+
+@pytest.mark.django_db
+def test_me_returns_evaluated_variants_without_rule_configuration(client):
+    alice = get_user_model().objects.create_user(email="alice@example.com")
+    bob = get_user_model().objects.create_user(email="bob@example.com")
+    feature = Feature.objects.create(
+        key="dashboard",
+        variants=["legacy", "v2"],
+        default_variant="legacy",
+    )
+    FeatureRule.objects.create(
+        feature=feature,
+        priority=10,
+        variant="v2",
+        audience=FeatureRule.Audience.USER,
+        user=alice,
+    )
+
+    client.force_login(alice)
+    alice_response = client.get("/api/me/")
+    client.force_login(bob)
+    bob_response = client.get("/api/me/")
+
+    assert alice_response.json()["features"] == {"dashboard": "v2"}
+    assert bob_response.json()["features"] == {"dashboard": "legacy"}
+    assert "rules" not in alice_response.json()

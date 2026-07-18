@@ -1,29 +1,21 @@
-from functools import wraps
-
 from django.http import Http404
 from rest_framework.permissions import BasePermission
 
-from .flags import is_enabled
+from .flags import variant_for
+from .models import Feature
 
 
-def feature_required(key: str) -> type[BasePermission]:
-    class _FeatureEnabled(BasePermission):
+def feature_variant(key, expected, *, scope_getter=None):
+    class HasFeatureVariant(BasePermission):
         def has_permission(self, request, view):
-            if not is_enabled(key):
+            scope = scope_getter(request, view) if scope_getter else None
+            try:
+                selected = variant_for(key, user=request.user, scope=scope)
+            except Feature.DoesNotExist as error:
+                raise Http404 from error
+            if selected != expected:
                 raise Http404
             return True
 
-    return _FeatureEnabled
-
-
-def requires_feature(key: str):
-    def decorator(view):
-        @wraps(view)
-        def wrapper(request, *args, **kwargs):
-            if not is_enabled(key):
-                raise Http404
-            return view(request, *args, **kwargs)
-
-        return wrapper
-
-    return decorator
+    HasFeatureVariant.__name__ = f"Feature_{key}_{expected}"
+    return HasFeatureVariant

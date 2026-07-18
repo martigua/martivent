@@ -4,6 +4,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from access.decisions import effective_capabilities
+from features.flags import all_variants
 
 
 @extend_schema(responses=OpenApiTypes.OBJECT)
@@ -15,5 +16,6 @@ def me_view(request):
             "id": request.user.pk,
             "email": request.user.email,
             "capabilities": effective_capabilities(request.user),
+            "features": all_variants(user=request.user),
         }
     )

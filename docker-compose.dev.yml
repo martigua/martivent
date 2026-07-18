@@ -33,7 +33,6 @@ services:
       DEBUG: "true"
       ALLOWED_HOSTS: localhost,127.0.0.1
       DATABASE_URL: postgres://martivent:martivent@db:5432/martivent
-      FEATURES__SELECTION: "false"
       SSH_AUTH_SOCK: /ssh-agent   # matches the forwarded socket mount above
     depends_on:
       - db

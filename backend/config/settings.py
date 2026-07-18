@@ -28,7 +28,6 @@ SECRET_KEY = env.secret_key
 DEBUG = env.debug
 
 ALLOWED_HOSTS = env.hosts
-FEATURES = env.features
 
 
 # Application definition

@@ -9,6 +9,12 @@
 set -u
 cd /workspace || exit 1
 
+# Readiness marker: cleared now, created only once setup below completes, so tools
+# on the host (e.g. the `martisetup` fish function) can wait for a prepared shell
+# instead of racing the async bootstrap.
+ready_marker=/tmp/martivent-bootstrap-ready
+rm -f "$ready_marker"
+
 # Backend venv: provides ruff + pre-commit, both required by the git hooks.
 uv sync --project backend \
   || echo "bootstrap: 'uv sync --project backend' failed — backend + git hooks may not work" >&2
@@ -29,5 +35,7 @@ if [ -f .pre-commit-config.yaml ]; then
   uv run --project backend pre-commit install \
     || echo "bootstrap: 'pre-commit install' failed — commits will skip hooks" >&2
 fi
+
+touch "$ready_marker"
 
 exec "$@"

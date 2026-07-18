@@ -66,14 +66,16 @@ control presentation only.
 `GET /api/context/` is the frontend's single source for general application
 data. Its ordered `club.stats` entries include both labels and values so the
 frontend only renders them. The current club values are backend constants;
-counts can later be computed from registered teams and licences without
-changing that frontend contract.
+the serializer-backed response is also represented in the OpenAPI schema.
+
+The Django admin uses a small backend-owned subset of the design-system tokens.
+It intentionally does not depend on Angular assets.
 
 ## Environment
 
-`config/env.py` reads these required process environment variables. Docker
-Compose supplies them locally; the deployment platform supplies them in
-production.
+`config/env.py` reads these process environment variables. The first four are
+required. Docker Compose supplies local values; the deployment platform
+supplies production values.
 
 | Variable | Meaning |
 | --- | --- |

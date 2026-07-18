@@ -49,7 +49,7 @@ class ApplicationContextSerializer(serializers.Serializer):
 @extend_schema(responses=ApplicationContextSerializer)
 @api_view(["GET"])
 @permission_classes([AllowAny])
-def application_context_view(request):
+def application_context_view(_request):
     club = {
         **CLUB_CONTEXT,
         "stats": [
@@ -60,12 +60,10 @@ def application_context_view(request):
             for field, label in CLUB_STAT_FIELDS
         ],
     }
-
-    return Response(
-        {
-            "club": club,
-            "authentication": {
-                "google": env.google_enabled,
-            },
-        }
-    )
+    context = {
+        "club": club,
+        "authentication": {
+            "google": env.google_enabled,
+        },
+    }
+    return Response(ApplicationContextSerializer(context).data)

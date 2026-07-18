@@ -8,8 +8,10 @@ Run commands from `/workspace/frontend` inside the development container:
 ```bash
 npm ci
 npm start
+npm run lint
 npm test -- --watch=false
 npm run build
+npm run format
 ```
 
 The dev server is available at `http://localhost:4201/` and proxies `/api` and
@@ -30,8 +32,14 @@ The dev server is available at `http://localhost:4201/` and proxies `/api` and
 
 ## Design system
 
-Global primitive and semantic tokens live in `src/styles/`; global resets are
-in `src/styles.scss`. Reusable components live in `src/app/ui/`.
+Global primitive and semantic tokens live in `src/styles/`. Element defaults
+and resets live in `_elements.scss`; shared element and utility typography
+lives in `_typography.scss`. `styles.scss` only composes those global layers.
+Reusable components live in `src/app/ui/`.
+
+Heading and text elements receive global typography. Matching low-specificity
+classes such as `.h2`, `.text-label`, and `.display-md` provide the same styles
+when the semantic element differs.
 
 Component SCSS consumes design tokens and exposes a small `--mg-*` custom
 property API. Override those properties from the host without `::ng-deep`:

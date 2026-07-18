@@ -23,20 +23,21 @@ docker compose -f docker-compose.dev.yml up -d --build
 docker compose -f docker-compose.dev.yml exec dev fish
 ```
 
-In one container shell:
+The container bootstrap installs backend and frontend dependencies when needed
+and installs the Git pre-commit hook.
+
+In one container shell, start Django:
 
 ```bash
 cd /workspace/backend
-uv sync
 uv run python manage.py migrate
 uv run python manage.py runserver 0.0.0.0:8000
 ```
 
-In a second container shell:
+In a second container shell, start Angular:
 
 ```bash
 cd /workspace/frontend
-npm ci
 npm start
 ```
 
@@ -52,6 +53,7 @@ uv run pytest
 uv run pre-commit run --all-files
 
 cd /workspace/frontend
+npm run lint
 npm test -- --watch=false
 npm run build
 ```

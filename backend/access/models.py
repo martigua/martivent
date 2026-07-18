@@ -37,6 +37,20 @@ class OrganizationalGroup(models.Model):
     class Meta:
         ordering = ("name",)
 
+    def clean(self):
+        super().clean()
+        current = self.parent
+        seen = {self.pk} if self.pk is not None else set()
+        while current is not None:
+            if current.pk in seen:
+                raise ValidationError({"parent": "Organizational groups cannot form a cycle."})
+            seen.add(current.pk)
+            current = current.parent
+
+    def save(self, *args, **kwargs):
+        self.full_clean()
+        return super().save(*args, **kwargs)
+
     def ancestors(self, *, include_self=False):
         current = self if include_self else self.parent
         while current is not None:

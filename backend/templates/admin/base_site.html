@@ -5,7 +5,7 @@
 
 {% block extrastyle %}
   {{ block.super }}
-  {# Fonts fall back to system faces until the self-hosted Bebas/Inter files land. #}
+  {# The admin intentionally uses system fallbacks and does not depend on Angular assets. #}
   <link rel="stylesheet" href="{% static 'admin/martivent/tokens.css' %}">
   <link rel="stylesheet" href="{% static 'admin/martivent/admin.css' %}">
 {% endblock %}

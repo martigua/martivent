@@ -5,8 +5,9 @@ For backend work, [backend/README.md](backend/README.md) is the architecture and
 command reference.
 
 - Document current, working behavior only—never planned or removed behavior.
-- Prefer simple, readable code. Two similar implementations are acceptable;
-  abstract on the third only when it improves readability.
+- Follow KISS. Repeating a simple pattern twice is acceptable; apply DRY on the
+  third only when the abstraction improves readability. Avoid premature
+  abstraction and optimization.
 - Generate Django projects, apps, and migrations with Django commands; do not
   recreate generated boilerplate by hand.
 - Keep backend configuration environment-driven. Local values belong in Docker

@@ -1,9 +1,7 @@
-/* Martigua design-system tokens for the Django admin skin.
+/* Martigua design-system tokens used by the standalone Django admin.
 
-   CANONICAL SOURCE is the frontend: frontend/src/styles/_tokens.primitives.scss
-   and _tokens.semantic.scss. This file mirrors that subset by hand until the
-   build single-sources it (tracked in the admin-granter spec). Keep names and
-   values in lockstep with the frontend. */
+   Shared names mirror the frontend token files. Keeping this small subset here
+   avoids coupling Django static files to the Angular build. */
 
 :root {
   /* Primitives */
@@ -23,12 +21,21 @@
 
   --font-family-display: "Bebas Neue", "Arial Narrow", sans-serif;
   --font-family-body: "Inter", system-ui, sans-serif;
+  --font-weight-semibold: 600;
+  --focus-ring-width: 2px;
+  --focus-ring-offset: 1px;
 
   /* Semantic */
   --surface-page: var(--neutral-950);
   --surface-raised: var(--neutral-900);
   --surface-card: var(--neutral-850);
   --surface-interactive: var(--neutral-800);
+  --surface-interactive-hover: color-mix(
+    in srgb,
+    var(--surface-interactive) 80%,
+    var(--white)
+  );
+  --surface-selected: color-mix(in srgb, var(--yellow-500) 16%, var(--surface-raised));
 
   --text-primary: var(--white);
   --text-muted: var(--neutral-400);
@@ -42,8 +49,28 @@
   --action-primary-text: var(--text-inverse);
 
   --status-success-background: var(--green-500);
+  --status-success-surface: color-mix(
+    in srgb,
+    var(--status-success-background) 22%,
+    var(--surface-page)
+  );
   --status-danger-background: var(--red-500);
+  --status-danger-background-hover: color-mix(
+    in srgb,
+    var(--status-danger-background) 80%,
+    var(--neutral-950)
+  );
+  --status-danger-surface: color-mix(
+    in srgb,
+    var(--status-danger-background) 22%,
+    var(--surface-page)
+  );
   --status-info-background: var(--blue-500);
+  --status-warning-surface: color-mix(
+    in srgb,
+    var(--yellow-500) 20%,
+    var(--surface-page)
+  );
 
   --focus-ring-color: var(--yellow-500);
 }

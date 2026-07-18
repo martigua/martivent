@@ -39,6 +39,15 @@ def test_organizational_group_ancestors(groups):
 
 
 @pytest.mark.django_db
+def test_organizational_group_rejects_parent_cycles(groups):
+    club, u18, _u16 = groups
+    club.parent = u18
+
+    with pytest.raises(ValidationError, match="cycle"):
+        club.full_clean()
+
+
+@pytest.mark.django_db
 def test_grant_requires_exactly_one_recipient(user, permission):
     with pytest.raises(ValidationError, match="exactly one recipient"):
         Grant(permission=permission).full_clean()

@@ -33,25 +33,25 @@ html[data-theme="dark"] {
 
   --button-bg: var(--surface-interactive);
   --button-fg: var(--text-primary);
-  --button-hover-bg: #3c3c3c;
+  --button-hover-bg: var(--surface-interactive-hover);
   --default-button-bg: var(--action-primary-background);
   --default-button-hover-bg: var(--action-primary-background-hover);
   --close-button-bg: var(--surface-interactive);
-  --close-button-hover-bg: #3c3c3c;
+  --close-button-hover-bg: var(--surface-interactive-hover);
   --delete-button-bg: var(--status-danger-background);
-  --delete-button-hover-bg: #c53030;
+  --delete-button-hover-bg: var(--status-danger-background-hover);
 
   --object-tools-bg: var(--surface-interactive);
   --object-tools-fg: var(--text-primary);
-  --object-tools-hover-bg: #3c3c3c;
+  --object-tools-hover-bg: var(--surface-interactive-hover);
 
   --darkened-bg: var(--surface-raised);
   --selected-bg: var(--surface-raised);
-  --selected-row: #333018;
+  --selected-row: var(--surface-selected);
 
-  --message-success-bg: #16331f;
-  --message-warning-bg: #33300f;
-  --message-error-bg: #331717;
+  --message-success-bg: var(--status-success-surface);
+  --message-warning-bg: var(--status-warning-surface);
+  --message-error-bg: var(--status-danger-surface);
   --error-fg: var(--status-danger-background);
 
   --font-family-primary: var(--font-family-body);
@@ -66,7 +66,7 @@ html[data-theme="dark"] {
 input[type="submit"].default,
 .submit-row input.default {
   color: var(--action-primary-text);
-  font-weight: 600;
+  font-weight: var(--font-weight-semibold);
 }
 
 #branding h1,
@@ -78,6 +78,6 @@ input[type="submit"].default,
 }
 
 :focus-visible {
-  outline: 2px solid var(--focus-ring-color);
-  outline-offset: 1px;
+  outline: var(--focus-ring-width) solid var(--focus-ring-color);
+  outline-offset: var(--focus-ring-offset);
 }

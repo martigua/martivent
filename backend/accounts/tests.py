@@ -109,6 +109,15 @@ def test_google_login_matches_environment_configuration():
     assert google["EMAIL_AUTHENTICATION_AUTO_CONNECT"] is True
 
 
+def test_openapi_describes_current_user_response(client):
+    schema = client.get("/api/schema/?format=json").json()
+    response_schema = schema["paths"]["/api/me/"]["get"]["responses"]["200"]["content"][
+        "application/json"
+    ]["schema"]
+
+    assert response_schema == {"$ref": "#/components/schemas/CurrentUser"}
+
+
 @pytest.mark.django_db
 def test_me_requires_authentication(client):
     response = client.get("/api/me/")

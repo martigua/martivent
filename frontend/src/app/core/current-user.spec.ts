@@ -27,6 +27,7 @@ describe('CurrentUser', () => {
     http.expectOne('/api/me/').flush({
       id: 7,
       email: 'coach@martigua.fr',
+      is_validated: false,
       capabilities: {
         'accounts.view_user': [{ kind: 'role', name: 'coach', scope: 'u18' }],
       },
@@ -35,6 +36,7 @@ describe('CurrentUser', () => {
     await TestBed.inject(ApplicationRef).whenStable();
 
     expect(service.user()?.email).toBe('coach@martigua.fr');
+    expect(service.user()?.is_validated).toBe(false);
     expect(service.hasCapability('accounts.view_user')()).toBe(true);
     expect(service.hasCapability('accounts.change_user')()).toBe(false);
     expect(service.hasFeature('dashboard', 'v2')()).toBe(true);

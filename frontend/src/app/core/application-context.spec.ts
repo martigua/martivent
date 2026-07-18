@@ -48,4 +48,38 @@ describe('ApplicationContext', () => {
     expect(service.context()?.club.team_count).toBe(7);
     expect(service.context()?.authentication.google).toBe(false);
   });
+
+  it('exposes load failures and reloads the backend context', async () => {
+    TestBed.tick();
+
+    http.expectOne('/api/context/').flush(null, {
+      status: 503,
+      statusText: 'Service Unavailable',
+    });
+    await TestBed.inject(ApplicationRef).whenStable();
+
+    expect(service.error()).toEqual(expect.objectContaining({ status: 503 }));
+
+    service.reload();
+    TestBed.tick();
+
+    http.expectOne('/api/context/').flush({
+      club: {
+        name: 'Martigua Sports Culture Loisirs',
+        sport: 'Handball',
+        location: 'Paris 19e',
+        founded_year: 1978,
+        team_count: 7,
+        licensed_member_count: 230,
+        stats: [],
+      },
+      authentication: {
+        google: false,
+      },
+    });
+    await TestBed.inject(ApplicationRef).whenStable();
+
+    expect(service.error()).toBeUndefined();
+    expect(service.context()?.club.name).toBe('Martigua Sports Culture Loisirs');
+  });
 });

@@ -52,16 +52,30 @@ when its responsibility becomes part of the backend architecture.
 | --- | --- |
 | `GET /healthz` | Liveness check |
 | `/admin/` | Django administration |
-| `POST /accounts/login/` | Password login and session creation |
-| `POST /accounts/logout/` | Session logout |
-| `POST /accounts/google/login/` | Start Google OAuth login when configured |
+| `/accounts/` | Public signup, login/logout, password reset, email management, reauthentication, and optional Google login |
 | `GET /api/context/` | Public club, display-stat, and authentication context |
 | `GET /api/schema/` | Generated OpenAPI schema |
-| `GET /api/me/` | Authenticated user, effective capabilities, and feature variants |
+| `GET /api/me/` | Authenticated user, administrator-validation state, effective capabilities, and feature variants |
 
 The API currently uses Django session authentication. The backend is the
 authority for every protected action. Client-side capability and feature checks
 control presentation only.
+
+Public signup creates an active but unvalidated account. Account validation is
+a global administrator-controlled status, independent of email verification,
+capabilities, and feature variants. Only superusers can change this status in
+the current administration interface. Existing and newly created superusers
+are validated.
+
+Choose the narrowest backend boundary an operation needs:
+
+- public operations explicitly use DRF `AllowAny`;
+- registered-user operations use `IsAuthenticated`;
+- validated-account operations use `accounts.permissions.IsValidated`;
+- action-specific operations additionally require their Django capability.
+
+`IsValidated` also rejects anonymous and inactive users. Validation never
+substitutes for an action capability, and a feature variant never grants one.
 
 `GET /api/context/` is the frontend's single source for general application
 data. Its ordered `club.stats` entries include both labels and values so the
@@ -89,6 +103,8 @@ supplies production values.
 There are intentionally no application defaults for the core values. Google
 login is disabled when both Google variables are absent or blank. Defining only
 one Google variable stops startup because the configuration is incomplete.
+Blank required strings also stop startup. Query parameters in `DATABASE_URL`,
+such as `sslmode=require`, are passed to PostgreSQL connection options.
 
 ## Google login
 
@@ -98,20 +114,26 @@ existing user. To enable it in an environment:
 
 1. In Google Cloud Console, create an OAuth client with application type
    **Web application**.
-2. Add `http://localhost:8001/accounts/google/login/callback/` as a local
+2. Add `http://localhost:4201/accounts/google/login/callback/` as a local
    redirect URI. Add `https://<railway-host>/accounts/google/login/callback/`
    for Railway.
 3. Export both variables before recreating the development service when testing
-   Google locally. Set both variables in Railway and redeploy to enable Google
-   login there.
+   Google locally. Run `uv run python manage.py migrate` after enabling Google
+   on an existing database. Set both variables in Railway, run migrations, and
+   redeploy to enable Google login there.
 
 Credentials are configured only through settings; do not also create a Google
 `SocialApp` in Django admin, because duplicate provider configuration is
 ambiguous.
 
+Railway overwrites the forwarded scheme and host headers before proxying to
+Django. The backend trusts those sanitized headers so OAuth callbacks retain
+their public HTTPS origin, and session and CSRF cookies are secure whenever
+debug mode is disabled.
+
 ## Authorization
 
-Authorization uses Django `Permission` objects as capabilities, identified as
+Authorization uses existing Django `Permission` objects as capabilities, identified as
 `<app_label>.<codename>`, for example `accounts.change_user`.
 
 A grant has:
@@ -124,7 +146,8 @@ A grant has:
 Grants are additive: there are no deny rules. A role assignment may further
 restrict a role grant's scope. Parent scopes cover descendants, and removing
 one source does not remove the same capability received from another source.
-Superusers bypass grant evaluation.
+Superusers bypass grant evaluation only for capabilities that resolve to a real
+Django permission.
 
 Use the decision function outside DRF:
 
@@ -163,6 +186,12 @@ A feature declares named variants and a default variant. Its ordered rules may
 target everyone, one user, one role, or one organizational group, optionally
 within an organizational scope. The matching rule with the lowest priority
 number wins; otherwise the default is returned.
+
+Variant names are nonblank canonical strings of at most 80 characters. A
+variant referenced by a rule must remain declared until that rule is changed
+or removed. When evaluation requests a scope, scoped role assignments apply
+only within their assigned scope and its descendants. Without a requested
+scope, a role assignment anywhere matches an unscoped role rule.
 
 Features control rollout and presentation, never authorization. A protected
 backend variant must therefore compose both checks:

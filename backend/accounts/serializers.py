@@ -10,5 +10,6 @@ class CapabilitySourceSerializer(serializers.Serializer):
 class CurrentUserSerializer(serializers.Serializer):
     id = serializers.IntegerField()
     email = serializers.EmailField()
+    is_validated = serializers.BooleanField()
     capabilities = serializers.DictField(child=CapabilitySourceSerializer(many=True))
     features = serializers.DictField(child=serializers.CharField())

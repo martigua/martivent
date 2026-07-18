@@ -1,8 +1,7 @@
-# The Linux box we develop inside — same Debian base and language versions
-# as CI and production, so "works here" means "works in prod".
+# The Linux development environment used by Docker Compose.
 FROM python:3.13-slim
 
-# sudo is the escape hatch: dev stays non-root by default (prod-like), but can
+# sudo is the escape hatch: dev stays non-root by default, but can
 # install one-off tools that vanish on the next rebuild. Anything worth keeping
 # goes in this file instead. ripgrep/fd/jq are baked in as daily-driver tooling.
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -39,8 +38,7 @@ RUN curl -fsSL https://deb.nodesource.com/setup_24.x | bash - \
     && rm -rf /var/lib/apt/lists/*
 
 # uv: the Python package manager for this project (`uv sync`, `uv run`).
-# Copied from Astral's official image — no network fetch. Pin the tag to a
-# released version for stricter reproducibility; uv.lock is the real guarantee.
+# Copied from Astral's official image without running a remote installer.
 COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /usr/local/bin/
 # The venv lives on the bind-mounted workspace (host fs) while uv's cache is in the
 # container fs — different filesystems, so hardlinks fail. Copy mode is correct here.
@@ -67,7 +65,7 @@ USER dev
 #     must not leak to the host. Pre-create nvim's data dirs as `dev` so the named
 #     volumes mounted over them inherit dev ownership (Docker copies the image
 #     path's ownership onto a fresh volume; else the mountpoints default to root).
-#   fish: ~/.config/fish is a real dir (config.fish is COPYed in below); only the
+#   fish: ~/.config/fish is a real dir (config.fish is symlinked below); only the
 #     personal functions/completions are symlinked from the dotfiles submodule.
 #     The host-only conf.d snippets are intentionally excluded.
 RUN mkdir -p /home/dev/.config/fish \

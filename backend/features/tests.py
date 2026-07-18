@@ -43,6 +43,9 @@ def groups():
         [],
         ["legacy", "legacy"],
         ["legacy", ""],
+        ["legacy", " v2"],
+        ["legacy", "v2 "],
+        ["legacy", "x" * 81],
         ["legacy", 2],
         "legacy",
     ],
@@ -77,6 +80,34 @@ def test_rule_variant_must_be_allowed(dashboard):
 
     with pytest.raises(ValidationError, match="allowed variant"):
         rule.full_clean()
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("variant", [" v2", "v2 ", "x" * 81])
+def test_rule_variant_must_be_canonical(dashboard, variant):
+    rule = FeatureRule(
+        feature=dashboard,
+        priority=1,
+        variant=variant,
+        audience=FeatureRule.Audience.EVERYONE,
+    )
+
+    with pytest.raises(ValidationError, match="Variant"):
+        rule.full_clean()
+
+
+@pytest.mark.django_db
+def test_feature_cannot_remove_variant_used_by_rule(dashboard):
+    FeatureRule.objects.create(
+        feature=dashboard,
+        priority=1,
+        variant="v2",
+        audience=FeatureRule.Audience.EVERYONE,
+    )
+    dashboard.variants = ["legacy", "experimental"]
+
+    with pytest.raises(ValidationError, match="used by a rule"):
+        dashboard.full_clean()
 
 
 @pytest.mark.django_db
@@ -205,6 +236,24 @@ def test_scoped_role_assignment_must_cover_requested_scope(dashboard, user, grou
         scope=u18,
     )
 
+    assert variant_for("dashboard", user=user, scope=u18) == "v2"
+    assert variant_for("dashboard", user=user, scope=u16) == "legacy"
+
+
+@pytest.mark.django_db
+def test_unscoped_role_rule_respects_requested_scope(dashboard, user, groups):
+    _club, u18, u16 = groups
+    coach = Role.objects.create(name="Coach", slug="coach")
+    RoleAssignment.objects.create(user=user, role=coach, scope=u18)
+    FeatureRule.objects.create(
+        feature=dashboard,
+        priority=10,
+        variant="v2",
+        audience=FeatureRule.Audience.ROLE,
+        role=coach,
+    )
+
+    assert variant_for("dashboard", user=user) == "v2"
     assert variant_for("dashboard", user=user, scope=u18) == "v2"
     assert variant_for("dashboard", user=user, scope=u16) == "legacy"
 

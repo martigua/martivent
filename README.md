@@ -19,12 +19,14 @@ Requirements: Git, Docker, and Docker Compose.
 ```bash
 git clone --recurse-submodules git@github.com:martigua/martivent.git
 cd martivent
-docker compose -f docker-compose.dev.yml up -d --build
+docker compose -f docker-compose.dev.yml up -d --build --wait
 docker compose -f docker-compose.dev.yml exec dev fish
 ```
 
 The container bootstrap installs backend and frontend dependencies when needed
-and installs the Git pre-commit hook.
+and installs the Git pre-commit hook. Compose reports the development service
+healthy only after that bootstrap succeeds; the container remains available
+for inspection when setup fails.
 
 In one container shell, start Django:
 
@@ -59,4 +61,5 @@ npm run build
 ```
 
 Stop with `docker compose -f docker-compose.dev.yml down`. Add `-v` only when
-you also want to delete the local PostgreSQL data.
+you also want to delete every named development volume: PostgreSQL data and
+the Neovim plugin, state, and cache volumes.

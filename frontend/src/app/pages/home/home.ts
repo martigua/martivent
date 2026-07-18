@@ -14,9 +14,10 @@ import { Tag } from '../../ui/tag/tag';
     <section class="hero">
       @if (club(); as club) {
         <mg-section-header [eyebrow]="eyebrow()" [titleText]="club.name" [lead]="lead()" />
-        <div class="actions">
-          <mg-button>Nous rejoindre</mg-button>
-          <mg-button variant="secondary">Découvrir les équipes</mg-button>
+      } @else if (error()) {
+        <div role="alert">
+          <p>Impossible de charger les informations du club.</p>
+          <mg-button (click)="reload()">Réessayer</mg-button>
         </div>
       } @else {
         <p role="status">Chargement des informations du club…</p>
@@ -27,14 +28,11 @@ import { Tag } from '../../ui/tag/tag';
       <mg-stat-band [stats]="stats()" />
     }
 
-    <section class="foundation" id="dashboard">
+    <section class="foundation">
       <mg-card>
         <mg-tag tone="success">Fondation technique</mg-tag>
         <h2>Prête pour les prochains terrains de jeu.</h2>
-        <p>
-          Cette première page valide le design system, les variantes de fonctionnalités et les
-          droits transmis par Django.
-        </p>
+        <p>Cette première page valide le design system et les données transmises par Django.</p>
       </mg-card>
     </section>
   `,
@@ -43,6 +41,7 @@ import { Tag } from '../../ui/tag/tag';
 export class Home {
   private readonly applicationContext = inject(ApplicationContext);
 
+  protected readonly error = this.applicationContext.error;
   protected readonly club = computed(() => this.applicationContext.context()?.club ?? null);
   protected readonly eyebrow = computed(() => {
     const club = this.club();
@@ -53,4 +52,8 @@ export class Home {
     return club ? `Un club ouvert, exigeant et convivial, fondé en ${club.founded_year}.` : '';
   });
   protected readonly stats = computed(() => this.club()?.stats ?? []);
+
+  protected reload(): void {
+    this.applicationContext.reload();
+  }
 }

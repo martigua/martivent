@@ -16,6 +16,7 @@ def me_view(request):
     current_user = {
         "id": request.user.pk,
         "email": request.user.email,
+        "is_validated": request.user.is_validated,
         "capabilities": effective_capabilities(request.user),
         "features": all_variants(user=request.user),
     }

@@ -18,10 +18,10 @@ set -g fish_prompt_pwd_dir_length 0
 function fish_prompt --description 'martivent container prompt'
     set -l last_status $status   # capture before any command runs
 
-    # Design-system palette (docs/.../foundation-design.md, tier-1 primitives).
+    # Design-system palette from the frontend primitive and semantic tokens.
     set -l brand   f5c800   # --yellow-500  (action-primary)
-    set -l chip_bg 2e2e2e   # --neutral-800 (surface-card)
-    set -l muted   888888   # --neutral-400 (text-muted)
+    set -l chip_bg 202020   # --neutral-850 (surface-card)
+    set -l muted   a3a3a3   # --neutral-400 (text-muted)
     set -l info     3b82f6  # --blue-500    (status-info)
     set -l danger   ef4444  # --red-500     (status-danger)
 

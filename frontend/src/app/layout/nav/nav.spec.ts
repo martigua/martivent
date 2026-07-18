@@ -1,54 +1,50 @@
+import { Component } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
-import { signal } from '@angular/core';
+import { provideRouter, Router } from '@angular/router';
 
-import { CurrentUser } from '../../core/current-user';
 import { Nav } from './nav';
 
+@Component({
+  template: '',
+})
+class RouteTarget {}
+
 describe('Nav', () => {
-  let component: Nav;
   let fixture: ComponentFixture<Nav>;
-  const canViewMembers = signal(false);
-  const hasDashboardV2 = signal(false);
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [Nav],
-      providers: [
-        provideRouter([]),
-        {
-          provide: CurrentUser,
-          useValue: {
-            hasCapability: () => canViewMembers.asReadonly(),
-            hasFeature: () => hasDashboardV2.asReadonly(),
-          },
-        },
-      ],
+      providers: [provideRouter([{ path: '', component: RouteTarget }])],
     }).compileComponents();
 
-    canViewMembers.set(false);
-    hasDashboardV2.set(false);
     fixture = TestBed.createComponent(Nav);
-    component = fixture.componentInstance;
+    await TestBed.inject(Router).navigateByUrl('/');
     await fixture.whenStable();
   });
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
-
-  it('shows capability and feature navigation only when granted', async () => {
+  it('does not render links to placeholder fragments', () => {
     const nav = fixture.nativeElement as HTMLElement;
 
+    const destinations = Array.from(nav.querySelectorAll('a'), (link) => link.getAttribute('href'));
+
+    expect(destinations).not.toContain('/#members');
+    expect(destinations).not.toContain('/#dashboard');
     expect(nav.textContent).not.toContain('Membres');
     expect(nav.textContent).not.toContain('Tableau de bord v2');
+  });
 
-    canViewMembers.set(true);
-    hasDashboardV2.set(true);
-    await fixture.whenStable();
+  it('marks the active home link semantically and visually', () => {
+    const nav = fixture.nativeElement as HTMLElement;
+    const homeLink = Array.from(nav.querySelectorAll('a')).find(
+      (link) => link.textContent.trim() === 'Accueil',
+    );
+    if (!homeLink) {
+      throw new Error('Home navigation link not found');
+    }
 
-    expect(nav.textContent).toContain('Membres');
-    expect(nav.textContent).toContain('Tableau de bord v2');
+    expect(homeLink.getAttribute('aria-current')).toBe('page');
+    expect(getComputedStyle(homeLink).textDecorationLine).toBe('underline');
   });
 
   it('uses shared typography classes', () => {

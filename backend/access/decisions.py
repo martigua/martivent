@@ -140,15 +140,16 @@ def _source(candidate):
 def decide(user, permission_name, *, scope=None, target=None):
     if not getattr(user, "is_authenticated", False) or not user.is_active:
         return Decision(allowed=False)
+
+    permission = _permission(permission_name)
+    if permission is None:
+        return Decision(allowed=False)
+
     if user.is_superuser:
         return Decision(
             allowed=True,
             sources=(GrantSource("superuser", user.email, None),),
         )
-
-    permission = _permission(permission_name)
-    if permission is None:
-        return Decision(allowed=False)
 
     sources = []
     for candidate in _candidates(user, permission):

@@ -11,17 +11,21 @@ dl {
 
 div {
   background: var(--mg-stat-band-background, var(--surface-raised));
+  display: flex;
+  flex-direction: column;
   padding: var(--mg-stat-band-padding, clamp(var(--space-5), 4vw, var(--space-8)));
   text-align: var(--mg-stat-band-alignment, center);
 }
 
 dd {
   color: var(--mg-stat-band-value-color, var(--action-primary-background));
+  order: 1;
 }
 
 dt {
   color: var(--mg-stat-band-label-color, var(--text-muted));
   margin-top: var(--mg-stat-band-label-gap, var(--space-2));
+  order: 2;
 }
 
 @media (max-width: breakpoints.$mobile) {

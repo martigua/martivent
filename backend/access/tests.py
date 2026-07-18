@@ -179,6 +179,19 @@ def test_superuser_bypasses_grants(permission):
 
 
 @pytest.mark.django_db
+def test_superuser_is_denied_for_unknown_capability():
+    superuser = get_user_model().objects.create_superuser(
+        email="admin@example.com",
+        password="pw",
+    )
+
+    decision = decide(superuser, "accounts.typo_permission")
+
+    assert not decision.allowed
+    assert decision.sources == ()
+
+
+@pytest.mark.django_db
 def test_anonymous_and_inactive_users_are_denied(user, permission):
     user.is_active = False
     user.save(update_fields=["is_active"])

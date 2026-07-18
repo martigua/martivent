@@ -29,6 +29,12 @@ DEBUG = env.debug
 
 ALLOWED_HOSTS = env.hosts
 
+# Railway sanitizes these forwarded headers before requests reach Django.
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+USE_X_FORWARDED_HOST = True
+SESSION_COOKIE_SECURE = not DEBUG
+CSRF_COOKIE_SECURE = not DEBUG
+
 
 # Application definition
 

@@ -8,7 +8,6 @@ html {
   background: var(--surface-page);
   color: var(--text-primary);
   font-family: var(--font-body);
-  scroll-behavior: smooth;
 }
 
 body {
@@ -41,4 +40,10 @@ a {
 ::selection {
   background: var(--selection-background);
   color: var(--selection-text);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
 }

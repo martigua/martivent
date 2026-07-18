@@ -10,6 +10,7 @@ export interface CapabilitySource {
 export interface SessionUser {
   id: number;
   email: string;
+  is_validated: boolean;
   capabilities: Record<string, CapabilitySource[]>;
   features: Record<string, string>;
 }

@@ -1,5 +1,5 @@
 # Local development environment. Two containers on one private network.
-#   docker compose -f docker-compose.dev.yml up -d --build   # start (first time builds the image)
+#   docker compose -f docker-compose.dev.yml up -d --build --wait   # start and wait for setup
 #   docker compose -f docker-compose.dev.yml exec dev fish    # get a shell inside linux (or: marti)
 #   docker compose -f docker-compose.dev.yml down             # stop
 name: martivent-dev
@@ -38,6 +38,12 @@ services:
       SSH_AUTH_SOCK: /ssh-agent   # matches the forwarded socket mount above
     depends_on:
       - db
+    healthcheck:
+      test: ["CMD", "test", "-f", "/tmp/martivent-bootstrap-ready"]
+      interval: 5s
+      timeout: 2s
+      retries: 3
+      start_period: 5m
 
   db:
     image: postgres:16

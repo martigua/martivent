@@ -30,15 +30,16 @@ src/styles/ global design tokens, element defaults, typography, breakpoints
 
 - `core/ApplicationContext` is the global read-only store for public
   backend-owned data from `GET /api/context/`.
-- `core/CurrentUser` is the global session store for the user, capability
-  sources, and evaluated feature variants from `GET /api/me/`.
+- `core/CurrentUser` is the global session store for the user,
+  administrator-validation state, capability sources, and evaluated feature
+  variants from `GET /api/me/`.
 - Backend checks are authoritative. Frontend gates improve navigation and UX
   but never replace backend authorization.
-- The landing page is the only route and stays eager. Every new route area
-  loads with `loadChildren` so it stays out of the initial bundle;
-  `angular.json` enforces the initial-size budget. Use `:id`, a nested
-  `<router-outlet>`, and component input binding when a feature has entity
-  subpages.
+- The landing page is the only route and stays eager. Lazy-load a meaningful
+  route area when separation improves initial bundle size or route ownership;
+  keep small routes direct. `angular.json` enforces the initial-size budget.
+  Use `:id`, a nested `<router-outlet>`, and component input binding when a
+  feature has entity subpages.
 - New forms use Angular Signal Forms.
 
 ## Dependencies

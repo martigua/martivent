@@ -1,4 +1,4 @@
-from urllib.parse import unquote, urlparse
+from urllib.parse import parse_qsl, unquote, urlparse
 
 from pydantic import PostgresDsn, field_validator, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -16,6 +16,21 @@ class Env(BaseSettings):
     database_url: PostgresDsn
     google_client_id: str | None = None
     google_client_secret: str | None = None
+
+    @field_validator("secret_key")
+    @classmethod
+    def secret_key_is_not_blank(cls, value):
+        value = value.strip()
+        if not value:
+            raise ValueError("SECRET_KEY must not be blank")
+        return value
+
+    @field_validator("allowed_hosts")
+    @classmethod
+    def allowed_hosts_are_not_blank(cls, value):
+        if not any(host.strip() for host in value.split(",")):
+            raise ValueError("ALLOWED_HOSTS must contain at least one host")
+        return value
 
     @field_validator("google_client_id", "google_client_secret", mode="before")
     @classmethod
@@ -39,9 +54,9 @@ class Env(BaseSettings):
         return [host.strip() for host in self.allowed_hosts.split(",") if host.strip()]
 
     @property
-    def database(self) -> dict[str, str]:
+    def database(self) -> dict[str, object]:
         url = urlparse(str(self.database_url))
-        return {
+        database = {
             "ENGINE": "django.db.backends.postgresql",
             "NAME": unquote(url.path.lstrip("/")),
             "USER": unquote(url.username or ""),
@@ -49,6 +64,10 @@ class Env(BaseSettings):
             "HOST": url.hostname or "",
             "PORT": str(url.port or 5432),
         }
+        options = dict(parse_qsl(url.query, keep_blank_values=True))
+        if options:
+            database["OPTIONS"] = options
+        return database
 
 
 env = Env()

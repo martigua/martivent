@@ -1,23 +1,26 @@
+import { Component, ViewEncapsulation } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { Tag } from './tag';
 
+@Component({
+  template: '',
+  styleUrl: '../../../styles/_tokens.semantic.scss',
+  encapsulation: ViewEncapsulation.None,
+})
+class SemanticTokens {}
+
 describe('Tag', () => {
-  let component: Tag;
   let fixture: ComponentFixture<Tag>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [Tag],
+      imports: [Tag, SemanticTokens],
     }).compileComponents();
 
+    TestBed.createComponent(SemanticTokens);
     fixture = TestBed.createComponent(Tag);
-    component = fixture.componentInstance;
     await fixture.whenStable();
-  });
-
-  it('should create', () => {
-    expect(component).toBeTruthy();
   });
 
   it('applies its requested tone', async () => {
@@ -29,5 +32,12 @@ describe('Tag', () => {
 
     expect(tag?.classList).toContain('success');
     expect(tag?.classList).toContain('text-label');
+  });
+
+  it('uses inverse text for info and danger status backgrounds', () => {
+    const tokens = getComputedStyle(document.documentElement);
+
+    expect(tokens.getPropertyValue('--status-info-text').trim()).toBe('var(--text-inverse)');
+    expect(tokens.getPropertyValue('--status-danger-text').trim()).toBe('var(--text-inverse)');
   });
 });

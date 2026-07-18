@@ -5,6 +5,8 @@ from django.db.models import Q
 
 from access.models import OrganizationalGroup, Role, RoleAssignment
 
+VARIANT_MAX_LENGTH = 80
+
 
 def _scope_covers(granted, requested):
     if granted is None:
@@ -12,6 +14,12 @@ def _scope_covers(granted, requested):
     if requested is None:
         return False
     return any(ancestor.pk == granted.pk for ancestor in requested.ancestors(include_self=True))
+
+
+def _is_valid_variant_name(value):
+    return (
+        isinstance(value, str) and value == value.strip() and 0 < len(value) <= VARIANT_MAX_LENGTH
+    )
 
 
 class Feature(models.Model):
@@ -28,13 +36,32 @@ class Feature(models.Model):
         valid_variants = (
             isinstance(self.variants, list)
             and bool(self.variants)
-            and all(isinstance(item, str) and bool(item) for item in self.variants)
+            and all(_is_valid_variant_name(item) for item in self.variants)
             and len(self.variants) == len(set(self.variants))
         )
         if not valid_variants:
-            raise ValidationError({"variants": "Variants must be unique non-empty strings."})
+            raise ValidationError(
+                {
+                    "variants": (
+                        "Variants must be unique non-empty strings of at most "
+                        f"{VARIANT_MAX_LENGTH} characters without surrounding whitespace."
+                    )
+                }
+            )
         if self.default_variant not in self.variants:
             raise ValidationError({"default_variant": "Default must be an allowed variant."})
+        if self.pk is not None:
+            referenced_variants = set(self.rules.values_list("variant", flat=True))
+            removed_variants = sorted(referenced_variants - set(self.variants))
+            if removed_variants:
+                raise ValidationError(
+                    {
+                        "variants": (
+                            "A variant used by a rule cannot be removed: "
+                            f"{', '.join(removed_variants)}."
+                        )
+                    }
+                )
 
     def save(self, *args, **kwargs):
         self.full_clean()
@@ -57,7 +84,7 @@ class FeatureRule(models.Model):
         related_name="rules",
     )
     priority = models.PositiveIntegerField()
-    variant = models.CharField(max_length=80)
+    variant = models.CharField(max_length=VARIANT_MAX_LENGTH)
     audience = models.CharField(max_length=20, choices=Audience)
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -128,6 +155,15 @@ class FeatureRule(models.Model):
 
     def clean(self):
         super().clean()
+        if not _is_valid_variant_name(self.variant):
+            raise ValidationError(
+                {
+                    "variant": (
+                        "Variant must be a non-empty string of at most "
+                        f"{VARIANT_MAX_LENGTH} characters without surrounding whitespace."
+                    )
+                }
+            )
         if self.feature_id and self.variant not in self.feature.variants:
             raise ValidationError({"variant": "Rule must select an allowed variant."})
 
@@ -161,7 +197,7 @@ class FeatureRule(models.Model):
             return user.organizational_memberships.filter(group_id=self.group_id).exists()
         if self.audience == self.Audience.ROLE:
             assignments = RoleAssignment.objects.filter(user=user, role_id=self.role_id)
-            if self.scope_id is None:
+            if scope is None:
                 return assignments.exists()
             return any(
                 _scope_covers(assignment.scope, scope)

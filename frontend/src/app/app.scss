@@ -1,0 +1,10 @@
+:host {
+  display: block;
+  min-height: 100dvh;
+}
+
+main {
+  margin-inline: auto;
+  max-width: var(--mg-app-content-width, var(--content-width));
+  padding-inline: var(--mg-app-content-gutter, var(--content-gutter));
+}

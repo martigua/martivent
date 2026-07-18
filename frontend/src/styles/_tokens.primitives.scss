@@ -1,0 +1,68 @@
+:root {
+  --yellow-300: #ffe55c;
+  --yellow-500: #f5c800;
+  --yellow-600: #d4a900;
+  --white: #ffffff;
+  --neutral-950: #0d0d0d;
+  --neutral-900: #171717;
+  --neutral-850: #202020;
+  --neutral-800: #2e2e2e;
+  --neutral-500: #737373;
+  --neutral-400: #a3a3a3;
+  --green-400: #4ade80;
+  --green-500: #22c55e;
+  --red-500: #ef4444;
+  --blue-500: #3b82f6;
+
+  --font-family-display: 'Bebas Neue', 'Arial Narrow', sans-serif;
+  --font-family-body: 'Inter Variable', system-ui, sans-serif;
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-md: 1rem;
+  --font-size-lg: 1.2rem;
+  --font-size-display-sm: clamp(2rem, 5vw, 3.5rem);
+  --font-size-display-md: clamp(2.5rem, 8vw, 4.5rem);
+  --font-size-display-lg: clamp(3.2rem, 10vw, 6.5rem);
+  --font-weight-regular: 400;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --line-height-tight: 0.95;
+  --line-height-body: 1.7;
+  --letter-spacing-label: 0.1em;
+  --letter-spacing-display: 0.02em;
+
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-24: 6rem;
+  --space-32: 8rem;
+
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-pill: 999px;
+  --border-width-thin: 1px;
+  --focus-ring-width: 3px;
+  --focus-ring-offset: 3px;
+
+  --shadow-sm: 0 0.75rem 2rem rgb(0 0 0 / 18%);
+  --shadow-md: 0 1.5rem 4rem rgb(0 0 0 / 28%);
+
+  --motion-duration-fast: 150ms;
+  --motion-duration-medium: 250ms;
+  --motion-easing-standard: ease;
+
+  --content-width: 72rem;
+  --content-gutter: clamp(var(--space-5), 4vw, var(--space-8));
+  --viewport-min-width: 20rem;
+  --navigation-height: 4.5rem;
+  --hero-height: 42rem;
+  --measure-title: 12ch;
+  --measure-body: 58ch;
+  --layer-navigation: 10;
+}

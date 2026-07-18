@@ -1,0 +1,17 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block title %}{% if subtitle %}{{ subtitle }} | {% endif %}{{ title }} | Martivent{% endblock %}
+
+{% block extrastyle %}
+  {{ block.super }}
+  {# Fonts fall back to system faces until the self-hosted Bebas/Inter files land. #}
+  <link rel="stylesheet" href="{% static 'admin/martivent/tokens.css' %}">
+  <link rel="stylesheet" href="{% static 'admin/martivent/admin.css' %}">
+{% endblock %}
+
+{% block branding %}
+  <div id="site-name">
+    <a href="{% url 'admin:index' %}">Martivent</a>
+  </div>
+{% endblock %}

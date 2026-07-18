@@ -1,0 +1,37 @@
+:root {
+  --surface-page: var(--neutral-950);
+  --surface-raised: var(--neutral-900);
+  --surface-card: var(--neutral-850);
+  --surface-interactive: var(--neutral-800);
+  --surface-navigation: color-mix(in srgb, var(--surface-page) 92%, transparent);
+
+  --text-primary: var(--white);
+  --text-muted: var(--neutral-400);
+  --text-inverse: var(--neutral-950);
+
+  --border-default: var(--neutral-800);
+  --border-emphasis: var(--yellow-500);
+
+  --action-primary-background: var(--yellow-500);
+  --action-primary-background-hover: var(--yellow-300);
+  --action-primary-text: var(--text-inverse);
+  --action-secondary-background: transparent;
+  --action-secondary-text: var(--text-primary);
+
+  --status-neutral-background: var(--surface-raised);
+  --status-neutral-text: var(--text-muted);
+  --status-success-background: var(--green-500);
+  --status-success-text: var(--text-inverse);
+  --status-danger-background: var(--red-500);
+  --status-danger-text: var(--white);
+  --status-info-background: var(--blue-500);
+  --status-info-text: var(--white);
+
+  --focus-ring-color: var(--yellow-500);
+  --selection-background: var(--yellow-500);
+  --selection-text: var(--text-inverse);
+  --elevation-card: var(--shadow-sm);
+
+  --font-display: var(--font-family-display);
+  --font-body: var(--font-family-body);
+}

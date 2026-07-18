@@ -1,22 +1,20 @@
 # Martivent
 
-Web application for **Martigua Sports Culture Loisirs**, a handball club in
+Web application for Martigua Sports Culture Loisirs, a handball club in
 Paris 19e.
 
-The repository currently contains a Django REST backend with:
+- `backend/`: Django 5.2 REST API, PostgreSQL, session authentication,
+  additive scoped authorization, and feature variants.
+- `frontend/`: Angular 22 standalone, zoneless application and SCSS design
+  system.
 
-- email-based user accounts;
-- additive, scoped authorization for users, roles, and organizational groups;
-- audience-based feature variants;
-- Django administration, PostgreSQL persistence, and an OpenAPI schema.
+The backend is authoritative for data and access decisions. The frontend uses
+the same capabilities and feature variants to adapt navigation and controls.
+See the README in each application for its architecture and commands.
 
-See [backend/README.md](backend/README.md) for the backend architecture and
-development reference.
+## Run locally
 
-## Local setup
-
-The only host requirements are Git, Docker, and the Docker Compose plugin.
-Python, PostgreSQL, and the development tools run inside containers.
+Requirements: Git, Docker, and Docker Compose.
 
 ```bash
 git clone --recurse-submodules git@github.com:martigua/martivent.git
@@ -25,43 +23,38 @@ docker compose -f docker-compose.dev.yml up -d --build
 docker compose -f docker-compose.dev.yml exec dev fish
 ```
 
-Inside the container:
+In one container shell:
 
 ```bash
 cd /workspace/backend
 uv sync
 uv run python manage.py migrate
-uv run pre-commit install
-uv run python manage.py createsuperuser  # optional: access /admin/
 uv run python manage.py runserver 0.0.0.0:8000
 ```
 
-The backend is available from the host at:
-
-- `http://localhost:8001/healthz`
-- `http://localhost:8001/admin/`
-- `http://localhost:8001/api/schema/`
-
-Run the backend checks from `/workspace/backend`:
+In a second container shell:
 
 ```bash
+cd /workspace/frontend
+npm ci
+npm start
+```
+
+Open `http://localhost:4201/`. Django is exposed at
+`http://localhost:8001/`; Angular proxies `/api` and `/accounts` to it inside
+the development container.
+
+Run all checks:
+
+```bash
+cd /workspace/backend
 uv run pytest
 uv run pre-commit run --all-files
+
+cd /workspace/frontend
+npm test -- --watch=false
+npm run build
 ```
 
-Stop the environment with:
-
-```bash
-docker compose -f docker-compose.dev.yml down
-```
-
-Add `-v` to also delete the local database volume.
-
-## Repository layout
-
-```text
-backend/                 Django REST backend
-docker/dev/              Development shell and editor configuration
-docker-compose.dev.yml   Development services and environment variables
-Dockerfile.dev           Reproducible development image
-```
+Stop with `docker compose -f docker-compose.dev.yml down`. Add `-v` only when
+you also want to delete the local PostgreSQL data.

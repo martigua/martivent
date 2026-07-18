@@ -1,0 +1,36 @@
+@use 'styles/tokens.primitives' as primitives;
+@use 'styles/tokens.semantic' as semantic;
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--surface-page);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-width: var(--viewport-min-width);
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+a {
+  color: inherit;
+}
+
+::selection {
+  background: var(--selection-background);
+  color: var(--selection-text);
+}

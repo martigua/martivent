@@ -1,0 +1,38 @@
+:host {
+  display: block;
+}
+
+.hero {
+  min-height: min(
+    var(--mg-home-hero-height, var(--hero-height)),
+    calc(100vh - var(--navigation-height))
+  );
+  padding-block: var(--mg-home-hero-padding, clamp(var(--space-16), 11vw, var(--space-32)));
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mg-home-action-gap, var(--space-3));
+  margin-top: var(--mg-home-action-offset, var(--space-8));
+}
+
+.foundation {
+  padding-block: var(--mg-home-section-padding, clamp(var(--space-12), 8vw, var(--space-24)));
+}
+
+h2 {
+  font-family: var(--font-display);
+  font-size: var(--font-size-display-sm);
+  font-weight: var(--font-weight-regular);
+  letter-spacing: var(--letter-spacing-display);
+  margin: var(--space-5) 0 var(--space-2);
+  text-transform: uppercase;
+}
+
+p {
+  color: var(--text-muted);
+  line-height: var(--line-height-body);
+  margin: 0;
+  max-width: var(--measure-body);
+}

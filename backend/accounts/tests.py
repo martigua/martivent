@@ -1,8 +1,11 @@
 import pytest
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Permission
+from django.urls import NoReverseMatch, reverse
 
 from access.models import Grant, OrganizationalGroup, Role, RoleAssignment
+from config.env import env
 from features.models import Feature, FeatureRule
 
 
@@ -36,6 +39,74 @@ def test_superuser_flags_are_enforced():
             password="pw12345!",
             is_staff=False,
         )
+
+
+@pytest.mark.django_db
+def test_password_login_creates_session(client):
+    user = get_user_model().objects.create_user(
+        email="member@martigua.fr",
+        password="pw12345!",
+    )
+
+    response = client.post(
+        "/accounts/login/",
+        {"login": user.email, "password": "pw12345!"},
+    )
+
+    assert response.status_code == 302
+    assert response.headers["Location"] == "/"
+    assert client.get("/api/me/").json()["email"] == user.email
+
+
+@pytest.mark.django_db
+def test_password_login_rejects_invalid_password(client):
+    get_user_model().objects.create_user(
+        email="member@martigua.fr",
+        password="pw12345!",
+    )
+
+    response = client.post(
+        "/accounts/login/",
+        {"login": "member@martigua.fr", "password": "wrong"},
+    )
+
+    assert response.status_code == 200
+    assert client.get("/api/me/").status_code == 403
+
+
+@pytest.mark.django_db
+def test_logout_ends_session(client):
+    user = get_user_model().objects.create_user(
+        email="member@martigua.fr",
+        password="pw12345!",
+    )
+    client.force_login(user)
+
+    response = client.post("/accounts/logout/")
+
+    assert response.status_code == 302
+    assert response.headers["Location"] == "/"
+    assert client.get("/api/me/").status_code == 403
+
+
+def test_google_login_matches_environment_configuration():
+    if not env.google_enabled:
+        with pytest.raises(NoReverseMatch):
+            reverse("google_login")
+        return
+
+    assert reverse("google_login") == "/accounts/google/login/"
+    google = settings.SOCIALACCOUNT_PROVIDERS["google"]
+    assert google["APPS"] == [
+        {
+            "client_id": env.google_client_id,
+            "secret": env.google_client_secret,
+            "key": "",
+        }
+    ]
+    assert google["OAUTH_PKCE_ENABLED"] is True
+    assert google["EMAIL_AUTHENTICATION"] is True
+    assert google["EMAIL_AUTHENTICATION_AUTO_CONNECT"] is True
 
 
 @pytest.mark.django_db

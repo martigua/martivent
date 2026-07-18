@@ -33,6 +33,8 @@ services:
       DEBUG: "true"
       ALLOWED_HOSTS: localhost,127.0.0.1
       DATABASE_URL: postgres://martivent:martivent@db:5432/martivent
+      GOOGLE_CLIENT_ID: "${GOOGLE_CLIENT_ID:-}"
+      GOOGLE_CLIENT_SECRET: "${GOOGLE_CLIENT_SECRET:-}"
       SSH_AUTH_SOCK: /ssh-agent   # matches the forwarded socket mount above
     depends_on:
       - db

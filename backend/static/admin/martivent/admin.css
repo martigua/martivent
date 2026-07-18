@@ -1,0 +1,83 @@
+/* Skin the stock Django admin by remapping its own CSS variables to the design
+   system. Selector covers the OS-preference default and both admin theme-toggle
+   states so the club identity holds regardless of the viewer's theme. */
+
+:root,
+html[data-theme="light"],
+html[data-theme="dark"] {
+  --primary: var(--surface-card);
+  --primary-fg: var(--text-primary);
+  --secondary: var(--surface-raised);
+  --accent: var(--action-primary-background);
+
+  --body-fg: var(--text-primary);
+  --body-bg: var(--surface-page);
+  --body-quiet-color: var(--text-muted);
+  --body-loud-color: var(--text-primary);
+
+  --header-color: var(--text-primary);
+  --header-branding-color: var(--action-primary-background);
+  --header-bg: var(--surface-raised);
+  --header-link-color: var(--text-primary);
+
+  --breadcrumbs-fg: var(--text-muted);
+  --breadcrumbs-link-fg: var(--text-primary);
+  --breadcrumbs-bg: var(--surface-raised);
+
+  --link-fg: var(--action-primary-background);
+  --link-hover-color: var(--action-primary-background-hover);
+  --link-selected-fg: var(--action-primary-background-hover);
+
+  --hairline-color: var(--border-default);
+  --border-color: var(--border-default);
+
+  --button-bg: var(--surface-interactive);
+  --button-fg: var(--text-primary);
+  --button-hover-bg: #3c3c3c;
+  --default-button-bg: var(--action-primary-background);
+  --default-button-hover-bg: var(--action-primary-background-hover);
+  --close-button-bg: var(--surface-interactive);
+  --close-button-hover-bg: #3c3c3c;
+  --delete-button-bg: var(--status-danger-background);
+  --delete-button-hover-bg: #c53030;
+
+  --object-tools-bg: var(--surface-interactive);
+  --object-tools-fg: var(--text-primary);
+  --object-tools-hover-bg: #3c3c3c;
+
+  --darkened-bg: var(--surface-raised);
+  --selected-bg: var(--surface-raised);
+  --selected-row: #333018;
+
+  --message-success-bg: #16331f;
+  --message-warning-bg: #33300f;
+  --message-error-bg: #331717;
+  --error-fg: var(--status-danger-background);
+
+  --font-family-primary: var(--font-family-body);
+  --font-family-monospace:
+    ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  color-scheme: dark;
+}
+
+/* Yellow default/submit buttons need dark text for contrast. */
+.button.default,
+input[type="submit"].default,
+.submit-row input.default {
+  color: var(--action-primary-text);
+  font-weight: 600;
+}
+
+#branding h1,
+#branding h1 a:link,
+#branding h1 a:visited {
+  font-family: var(--font-family-display);
+  letter-spacing: 0.06em;
+  color: var(--action-primary-background);
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus-ring-color);
+  outline-offset: 1px;
+}

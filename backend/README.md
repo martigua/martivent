@@ -52,12 +52,22 @@ when its responsibility becomes part of the backend architecture.
 | --- | --- |
 | `GET /healthz` | Liveness check |
 | `/admin/` | Django administration |
+| `POST /accounts/login/` | Password login and session creation |
+| `POST /accounts/logout/` | Session logout |
+| `POST /accounts/google/login/` | Start Google OAuth login when configured |
+| `GET /api/context/` | Public club, display-stat, and authentication context |
 | `GET /api/schema/` | Generated OpenAPI schema |
 | `GET /api/me/` | Authenticated user, effective capabilities, and feature variants |
 
 The API currently uses Django session authentication. The backend is the
 authority for every protected action. Client-side capability and feature checks
 control presentation only.
+
+`GET /api/context/` is the frontend's single source for general application
+data. Its ordered `club.stats` entries include both labels and values so the
+frontend only renders them. The current club values are backend constants;
+counts can later be computed from registered teams and licences without
+changing that frontend contract.
 
 ## Environment
 
@@ -71,9 +81,31 @@ production.
 | `DEBUG` | Django debug mode |
 | `ALLOWED_HOSTS` | Comma-separated accepted host names |
 | `DATABASE_URL` | PostgreSQL connection URL |
+| `GOOGLE_CLIENT_ID` | Optional Google OAuth web client ID |
+| `GOOGLE_CLIENT_SECRET` | Optional Google OAuth web client secret |
 
-There are intentionally no application defaults for these values. Missing or
-invalid configuration stops Django during startup.
+There are intentionally no application defaults for the core values. Google
+login is disabled when both Google variables are absent or blank. Defining only
+one Google variable stops startup because the configuration is incomplete.
+
+## Google login
+
+Google login is configured from environment variables and uses PKCE. A verified
+Google email matching a password account authenticates and connects that
+existing user. To enable it in an environment:
+
+1. In Google Cloud Console, create an OAuth client with application type
+   **Web application**.
+2. Add `http://localhost:8001/accounts/google/login/callback/` as a local
+   redirect URI. Add `https://<railway-host>/accounts/google/login/callback/`
+   for Railway.
+3. Export both variables before recreating the development service when testing
+   Google locally. Set both variables in Railway and redeploy to enable Google
+   login there.
+
+Credentials are configured only through settings; do not also create a Google
+`SocialApp` in Django admin, because duplicate provider configuration is
+ambiguous.
 
 ## Authorization
 

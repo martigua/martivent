@@ -1,0 +1,49 @@
+/* Martigua design-system tokens for the Django admin skin.
+
+   CANONICAL SOURCE is the frontend: frontend/src/styles/_tokens.primitives.scss
+   and _tokens.semantic.scss. This file mirrors that subset by hand until the
+   build single-sources it (tracked in the admin-granter spec). Keep names and
+   values in lockstep with the frontend. */
+
+:root {
+  /* Primitives */
+  --yellow-300: #ffe55c;
+  --yellow-500: #f5c800;
+  --yellow-600: #d4a900;
+  --white: #ffffff;
+  --neutral-950: #0d0d0d;
+  --neutral-900: #171717;
+  --neutral-850: #202020;
+  --neutral-800: #2e2e2e;
+  --neutral-500: #737373;
+  --neutral-400: #a3a3a3;
+  --green-500: #22c55e;
+  --red-500: #ef4444;
+  --blue-500: #3b82f6;
+
+  --font-family-display: "Bebas Neue", "Arial Narrow", sans-serif;
+  --font-family-body: "Inter", system-ui, sans-serif;
+
+  /* Semantic */
+  --surface-page: var(--neutral-950);
+  --surface-raised: var(--neutral-900);
+  --surface-card: var(--neutral-850);
+  --surface-interactive: var(--neutral-800);
+
+  --text-primary: var(--white);
+  --text-muted: var(--neutral-400);
+  --text-inverse: var(--neutral-950);
+
+  --border-default: var(--neutral-800);
+  --border-emphasis: var(--yellow-500);
+
+  --action-primary-background: var(--yellow-500);
+  --action-primary-background-hover: var(--yellow-300);
+  --action-primary-text: var(--text-inverse);
+
+  --status-success-background: var(--green-500);
+  --status-danger-background: var(--red-500);
+  --status-info-background: var(--blue-500);
+
+  --focus-ring-color: var(--yellow-500);
+}

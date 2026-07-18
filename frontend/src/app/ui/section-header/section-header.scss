@@ -1,0 +1,28 @@
+.eyebrow {
+  color: var(--mg-section-header-eyebrow-color, var(--action-primary-background));
+  font-size: var(--mg-section-header-eyebrow-size, var(--font-size-sm));
+  font-weight: var(--mg-section-header-eyebrow-weight, var(--font-weight-bold));
+  letter-spacing: var(--mg-section-header-eyebrow-spacing, var(--letter-spacing-label));
+  margin: 0 0 var(--mg-section-header-eyebrow-gap, var(--space-3));
+  text-transform: var(--mg-section-header-eyebrow-transform, uppercase);
+}
+
+h1 {
+  color: var(--mg-section-header-title-color, var(--text-primary));
+  font-family: var(--mg-section-header-title-font, var(--font-display));
+  font-size: var(--mg-section-header-title-size, var(--font-size-display-lg));
+  font-weight: var(--mg-section-header-title-weight, var(--font-weight-regular));
+  letter-spacing: var(--mg-section-header-title-spacing, var(--letter-spacing-display));
+  line-height: var(--mg-section-header-title-line-height, var(--line-height-tight));
+  margin: 0;
+  max-width: var(--mg-section-header-title-width, var(--measure-title));
+  text-transform: var(--mg-section-header-title-transform, uppercase);
+}
+
+.lead {
+  color: var(--mg-section-header-lead-color, var(--text-muted));
+  font-size: var(--mg-section-header-lead-size, var(--font-size-lg));
+  line-height: var(--mg-section-header-lead-line-height, var(--line-height-body));
+  margin: var(--mg-section-header-lead-gap, var(--space-5)) 0 0;
+  max-width: var(--mg-section-header-lead-width, var(--measure-body));
+}

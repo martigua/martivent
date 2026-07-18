@@ -19,11 +19,18 @@ from django.contrib import admin
 from django.urls import include, path
 from drf_spectacular.views import SpectacularAPIView
 
+from .application_context import application_context_view
 from .health import healthz
+
+admin.site.site_header = "Martivent"
+admin.site.site_title = "Martivent admin"
+admin.site.index_title = "Administration"
 
 urlpatterns = [
     path("healthz", healthz, name="healthz"),
     path("admin/", admin.site.urls),
+    path("accounts/", include("allauth.urls")),
+    path("api/context/", application_context_view, name="application-context"),
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
     path("api/", include("accounts.urls")),
 ]

@@ -1,0 +1,14 @@
+:host {
+  display: block;
+}
+
+article {
+  background: var(--mg-card-background, var(--surface-card));
+  border-color: var(--mg-card-border-color, var(--border-default));
+  border-style: solid;
+  border-width: var(--mg-card-border-width, var(--border-width-thin));
+  border-radius: var(--mg-card-radius, var(--radius-md));
+  box-shadow: var(--mg-card-shadow, var(--elevation-card));
+  color: var(--mg-card-color, var(--text-primary));
+  padding: var(--mg-card-padding, clamp(var(--space-5), 4vw, var(--space-8)));
+}

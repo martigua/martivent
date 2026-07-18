@@ -50,4 +50,11 @@ describe('Nav', () => {
     expect(nav.textContent).toContain('Membres');
     expect(nav.textContent).toContain('Tableau de bord v2');
   });
+
+  it('uses shared typography classes', () => {
+    const nav = fixture.nativeElement as HTMLElement;
+
+    expect(nav.querySelector('.brand')?.classList).toContain('display-sm');
+    expect(nav.querySelector('.links')?.classList).toContain('text-small');
+  });
 });

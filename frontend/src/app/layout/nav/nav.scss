@@ -28,16 +28,11 @@ a {
 
 .brand {
   color: var(--mg-nav-brand-color, var(--action-primary-background));
-  font-family: var(--mg-nav-brand-font, var(--font-display));
-  font-size: var(--mg-nav-brand-size, var(--font-size-display-sm));
-  letter-spacing: var(--mg-nav-brand-spacing, var(--letter-spacing-display));
-  text-transform: var(--mg-nav-brand-transform, uppercase);
 }
 
 .links {
   align-items: center;
   display: flex;
-  font-size: var(--mg-nav-link-size, var(--font-size-sm));
   font-weight: var(--mg-nav-link-weight, var(--font-weight-semibold));
   gap: var(--mg-nav-link-gap, clamp(var(--space-3), 3vw, var(--space-8)));
 

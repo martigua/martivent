@@ -33,3 +33,14 @@ class CustomUserAdmin(UserAdmin):
             },
         ),
     )
+
+    # Only a superuser may hand out staff/superuser status, permissions, or groups.
+    # For anyone else these are read-only, which also drops them from the saved
+    # form data — so a crafted POST cannot self-escalate.
+    _privileged_fields = ("is_superuser", "is_staff", "user_permissions", "groups")
+
+    def get_readonly_fields(self, request, obj=None):
+        readonly = super().get_readonly_fields(request, obj)
+        if not request.user.is_superuser:
+            readonly = (*readonly, *self._privileged_fields)
+        return readonly

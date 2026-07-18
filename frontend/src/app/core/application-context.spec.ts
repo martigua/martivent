@@ -17,7 +17,9 @@ describe('ApplicationContext', () => {
     http = TestBed.inject(HttpTestingController);
   });
 
-  afterEach(() => http.verify());
+  afterEach(() => {
+    http.verify();
+  });
 
   it('loads backend-owned club and authentication context as a resource', async () => {
     TestBed.tick();

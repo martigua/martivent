@@ -1,12 +1,8 @@
 span {
   border-radius: var(--mg-tag-radius, var(--radius-pill));
   display: inline-block;
-  font-size: var(--mg-tag-font-size, var(--font-size-xs));
-  font-weight: var(--mg-tag-font-weight, var(--font-weight-bold));
-  letter-spacing: var(--mg-tag-letter-spacing, var(--letter-spacing-label));
   padding-block: var(--mg-tag-padding-block, var(--space-1));
   padding-inline: var(--mg-tag-padding-inline, var(--space-3));
-  text-transform: var(--mg-tag-text-transform, uppercase);
 
   &.neutral {
     background: var(--mg-tag-background, var(--status-neutral-background));

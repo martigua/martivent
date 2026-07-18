@@ -12,3 +12,19 @@ repos:
         entry: uv run --project backend ruff format
         language: system
         types_or: [python, pyi]
+
+      # Frontend: run from frontend/ so ESLint flat config + tsconfig resolve.
+      # ${@#frontend/} strips the repo-relative prefix pre-commit passes in.
+      - id: prettier
+        name: Prettier (frontend)
+        entry: bash -c 'cd frontend && npx prettier --write "${@#frontend/}"' --
+        language: system
+        files: ^frontend/.*\.(ts|html|scss|json|mjs|cjs|js)$
+        require_serial: true
+
+      - id: eslint
+        name: ESLint (frontend)
+        entry: bash -c 'cd frontend && npx eslint --fix --no-warn-ignored "${@#frontend/}"' --
+        language: system
+        files: ^frontend/.*\.(ts|html)$
+        require_serial: true

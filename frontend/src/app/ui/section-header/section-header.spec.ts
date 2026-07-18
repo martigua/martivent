@@ -25,7 +25,8 @@ describe('SectionHeader', () => {
     fixture.componentRef.setInput('lead', 'Handball Paris 19e');
     await fixture.whenStable();
 
-    expect(fixture.nativeElement.querySelector('h1').textContent).toContain('Martigua');
-    expect(fixture.nativeElement.textContent).toContain('Handball Paris 19e');
+    const host = fixture.nativeElement as HTMLElement;
+    expect(host.querySelector('h1')?.textContent).toContain('Martigua');
+    expect(host.textContent).toContain('Handball Paris 19e');
   });
 });

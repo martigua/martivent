@@ -82,5 +82,11 @@ RUN mkdir -p /home/dev/.config/fish \
     && ln -s /workspace/docker/dev/fish/config.fish \
              /home/dev/.config/fish/config.fish   # live-editable: prompt tweaks need no rebuild
 
+# Bootstrap the bind-mounted workspace on every start (venv, node_modules, git
+# hook) before handing off to CMD. Invoked via `bash` so it doesn't depend on the
+# script's exec bit surviving the host bind mount. The script lives on the mount,
+# which is present by the time the entrypoint runs.
+ENTRYPOINT ["bash", "/workspace/docker/dev/bootstrap.sh"]
+
 # No app process yet — keep the container alive so `docker compose exec` can attach.
 CMD ["sleep", "infinity"]

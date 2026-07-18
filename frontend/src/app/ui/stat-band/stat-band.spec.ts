@@ -22,7 +22,14 @@ describe('StatBand', () => {
   });
 
   it('renders each statistic', () => {
-    expect(fixture.nativeElement.textContent).toContain('Équipes');
-    expect(fixture.nativeElement.textContent).toContain('7');
+    const host = fixture.nativeElement as HTMLElement;
+    expect(host.textContent).toContain('Équipes');
+    expect(host.textContent).toContain('7');
+  });
+
+  it('uses shared typography classes', () => {
+    const host = fixture.nativeElement as HTMLElement;
+    expect(host.querySelector('dd')?.classList).toContain('display-md');
+    expect(host.querySelector('dt')?.classList).toContain('text-label');
   });
 });

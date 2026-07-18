@@ -24,6 +24,10 @@ describe('Tag', () => {
     fixture.componentRef.setInput('tone', 'success');
     await fixture.whenStable();
 
-    expect(fixture.nativeElement.querySelector('span').className).toBe('success');
+    const host = fixture.nativeElement as HTMLElement;
+    const tag = host.querySelector('span');
+
+    expect(tag?.classList).toContain('success');
+    expect(tag?.classList).toContain('text-label');
   });
 });

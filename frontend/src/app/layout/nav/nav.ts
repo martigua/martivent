@@ -8,8 +8,8 @@ import { CurrentUser } from '../../core/current-user';
   imports: [RouterLink, RouterLinkActive],
   template: `
     <nav aria-label="Navigation principale">
-      <a class="brand" routerLink="/">Martigua</a>
-      <div class="links">
+      <a class="brand display-sm" routerLink="/">Martigua</a>
+      <div class="links text-small">
         <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">
           Accueil
         </a>

@@ -2,7 +2,7 @@ import { Component, input } from '@angular/core';
 
 @Component({
   selector: 'mg-tag',
-  template: `<span [class]="tone()"><ng-content /></span>`,
+  template: `<span class="text-label" [class]="tone()"><ng-content /></span>`,
   styleUrl: './tag.scss',
 })
 export class Tag {

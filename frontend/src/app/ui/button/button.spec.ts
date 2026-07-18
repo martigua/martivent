@@ -24,6 +24,7 @@ describe('Button', () => {
     fixture.componentRef.setInput('variant', 'secondary');
     await fixture.whenStable();
 
-    expect(fixture.nativeElement.querySelector('button').className).toBe('secondary');
+    const host = fixture.nativeElement as HTMLElement;
+    expect(host.querySelector('button')?.className).toBe('secondary');
   });
 });

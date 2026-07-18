@@ -11,8 +11,8 @@ export interface Stat {
     <dl>
       @for (stat of stats(); track stat.label) {
         <div>
-          <dd>{{ stat.value }}</dd>
-          <dt>{{ stat.label }}</dt>
+          <dd class="display-md">{{ stat.value }}</dd>
+          <dt class="text-label">{{ stat.label }}</dt>
         </div>
       }
     </dl>

@@ -34,4 +34,24 @@
 
   --font-display: var(--font-family-display);
   --font-body: var(--font-family-body);
+  --type-heading-font: var(--font-display);
+  --type-heading-weight: var(--font-weight-regular);
+  --type-heading-line-height: var(--line-height-tight);
+  --type-heading-letter-spacing: var(--letter-spacing-display);
+  --type-heading-transform: uppercase;
+  --type-heading-1-size: var(--font-size-display-lg);
+  --type-heading-2-size: var(--font-size-display-sm);
+  --type-heading-3-size: var(--font-size-lg);
+  --type-heading-4-size: var(--font-size-md);
+  --type-heading-5-size: var(--font-size-sm);
+  --type-heading-6-size: var(--font-size-xs);
+  --type-body-size: var(--font-size-md);
+  --type-body-line-height: var(--line-height-body);
+  --type-lead-size: var(--font-size-lg);
+  --type-small-size: var(--font-size-sm);
+  --type-label-size: var(--font-size-xs);
+  --type-label-weight: var(--font-weight-bold);
+  --type-label-letter-spacing: var(--letter-spacing-label);
+  --type-label-transform: uppercase;
+  --type-eyebrow-size: var(--font-size-sm);
 }

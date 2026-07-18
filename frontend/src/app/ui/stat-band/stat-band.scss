@@ -17,19 +17,11 @@ div {
 
 dd {
   color: var(--mg-stat-band-value-color, var(--action-primary-background));
-  font-family: var(--mg-stat-band-value-font, var(--font-display));
-  font-size: var(--mg-stat-band-value-size, var(--font-size-display-md));
-  line-height: var(--mg-stat-band-value-line-height, var(--line-height-tight));
-  margin: 0;
 }
 
 dt {
   color: var(--mg-stat-band-label-color, var(--text-muted));
-  font-size: var(--mg-stat-band-label-size, var(--font-size-xs));
-  font-weight: var(--mg-stat-band-label-weight, var(--font-weight-bold));
-  letter-spacing: var(--mg-stat-band-label-spacing, var(--letter-spacing-label));
   margin-top: var(--mg-stat-band-label-gap, var(--space-2));
-  text-transform: var(--mg-stat-band-label-transform, uppercase);
 }
 
 @media (max-width: breakpoints.$mobile) {

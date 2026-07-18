@@ -17,7 +17,9 @@ describe('CurrentUser', () => {
     http = TestBed.inject(HttpTestingController);
   });
 
-  afterEach(() => http.verify());
+  afterEach(() => {
+    http.verify();
+  });
 
   it('loads the session as a resource and evaluates access', async () => {
     TestBed.tick();

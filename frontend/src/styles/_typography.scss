@@ -1,0 +1,76 @@
+:where(h1, .h1, h2, .h2, h3, .h3, h4, .h4, h5, .h5, h6, .h6) {
+  font-family: var(--type-heading-font);
+  font-weight: var(--type-heading-weight);
+  letter-spacing: var(--type-heading-letter-spacing);
+  line-height: var(--type-heading-line-height);
+  text-transform: var(--type-heading-transform);
+}
+
+:where(h1, .h1) {
+  font-size: var(--type-heading-1-size);
+}
+
+:where(h2, .h2) {
+  font-size: var(--type-heading-2-size);
+}
+
+:where(h3, .h3) {
+  font-size: var(--type-heading-3-size);
+}
+
+:where(h4, .h4) {
+  font-size: var(--type-heading-4-size);
+}
+
+:where(h5, .h5) {
+  font-size: var(--type-heading-5-size);
+}
+
+:where(h6, .h6) {
+  font-size: var(--type-heading-6-size);
+}
+
+:where(p, .p) {
+  font-size: var(--type-body-size);
+  line-height: var(--type-body-line-height);
+}
+
+:where(.lead) {
+  font-size: var(--type-lead-size);
+  line-height: var(--type-body-line-height);
+}
+
+:where(small, .small, .text-small) {
+  font-size: var(--type-small-size);
+}
+
+:where(.eyebrow, .text-label) {
+  font-size: var(--type-label-size);
+  font-weight: var(--type-label-weight);
+  letter-spacing: var(--type-label-letter-spacing);
+  text-transform: var(--type-label-transform);
+}
+
+:where(.eyebrow) {
+  font-size: var(--type-eyebrow-size);
+}
+
+:where(.display-sm, .display-md, .display-lg) {
+  font-family: var(--type-heading-font);
+  font-weight: var(--type-heading-weight);
+  letter-spacing: var(--type-heading-letter-spacing);
+  line-height: var(--type-heading-line-height);
+  text-transform: var(--type-heading-transform);
+}
+
+:where(.display-sm) {
+  font-size: var(--font-size-display-sm);
+}
+
+:where(.display-md) {
+  font-size: var(--font-size-display-md);
+}
+
+:where(.display-lg) {
+  font-size: var(--font-size-display-lg);
+}

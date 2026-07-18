@@ -1,0 +1,44 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--surface-page);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  scroll-behavior: smooth;
+}
+
+body {
+  font-size: var(--type-body-size);
+  line-height: var(--type-body-line-height);
+  margin: 0;
+  min-width: var(--viewport-min-width);
+}
+
+:where(h1, h2, h3, h4, h5, h6, p, dl, dd, figure, blockquote) {
+  margin: 0;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+a {
+  color: inherit;
+}
+
+:where(img, picture, svg, canvas) {
+  display: block;
+  max-width: 100%;
+}
+
+::selection {
+  background: var(--selection-background);
+  color: var(--selection-text);
+}

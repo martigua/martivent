@@ -9,8 +9,8 @@ Paris 19e.
   system.
 
 The backend is authoritative for data and access decisions. The frontend uses
-the same capabilities and feature variants to adapt navigation and controls.
-See the README in each application for its architecture and commands.
+the same capabilities and feature variants to adapt navigation. See the README
+in each application for its architecture and commands.
 
 ## Run locally
 

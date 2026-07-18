@@ -78,10 +78,9 @@ RUN mkdir -p /home/dev/.config/fish \
     && ln -s /workspace/docker/dev/vendor/dotfiles/.config/fish/functions \
              /home/dev/.config/fish/functions \
     && ln -s /workspace/docker/dev/vendor/dotfiles/.config/fish/completions \
-             /home/dev/.config/fish/completions
-
-# Container fish config: distinct prompt + reuse of the personal functions.
-COPY --chown=dev:dev docker/dev/fish/config.fish /home/dev/.config/fish/config.fish
+             /home/dev/.config/fish/completions \
+    && ln -s /workspace/docker/dev/fish/config.fish \
+             /home/dev/.config/fish/config.fish   # live-editable: prompt tweaks need no rebuild
 
 # No app process yet — keep the container alive so `docker compose exec` can attach.
 CMD ["sleep", "infinity"]

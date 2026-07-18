@@ -4,25 +4,28 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='SectionVisibility',
+            name="SectionVisibility",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('key', models.SlugField(unique=True)),
-                ('enabled', models.BooleanField(default=False)),
-                ('label', models.CharField(max_length=120)),
-                ('help_text', models.TextField(blank=True)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True, primary_key=True, serialize=False, verbose_name="ID"
+                    ),
+                ),
+                ("key", models.SlugField(unique=True)),
+                ("enabled", models.BooleanField(default=False)),
+                ("label", models.CharField(max_length=120)),
+                ("help_text", models.TextField(blank=True)),
             ],
             options={
-                'verbose_name': 'section visibility',
-                'verbose_name_plural': 'section visibilities',
+                "verbose_name": "section visibility",
+                "verbose_name_plural": "section visibilities",
             },
         ),
     ]

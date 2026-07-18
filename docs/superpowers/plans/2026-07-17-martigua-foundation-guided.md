@@ -39,7 +39,7 @@ historical plan.
 
 These parts have already been reviewed and exercised by the user:
 
-- [x] Development image: Python 3.13, Node 24, PostgreSQL client, uv, zsh.
+- [x] Development image: Python 3.13, Node 24, PostgreSQL client, uv, fish.
 - [x] Development Compose services: `dev` and PostgreSQL 16.
 - [x] Host ports: Django 8001, Angular 4201, PostgreSQL 5433.
 - [x] Repository bind-mounted at `/workspace`.

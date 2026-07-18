@@ -195,7 +195,7 @@ martivent/
 │   ├── src/styles/          design tokens
 │   └── src/app/ui/          design-system components
 ├── docs/superpowers/specs/
-├── Dockerfile.dev           dev container (uv + node + zsh)
+├── Dockerfile.dev           dev container (uv + node + fish)
 ├── docker-compose.dev.yml   local dev
 ├── Dockerfile               builds both, deploys to Railway
 └── .github/workflows/ci.yml

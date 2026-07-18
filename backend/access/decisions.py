@@ -70,10 +70,7 @@ def _target_matches(grant, target):
     if target is None:
         return False
     content_type = ContentType.objects.get_for_model(target, for_concrete_model=False)
-    return (
-        grant.target_content_type_id == content_type.pk
-        and grant.target_object_id == target.pk
-    )
+    return grant.target_content_type_id == content_type.pk and grant.target_object_id == target.pk
 
 
 def _grant_query(permission=None):
@@ -97,9 +94,7 @@ def _candidates(user, permission=None):
         yield _Candidate(grant=grant, kind="direct", name=user.email)
 
     assignments = list(
-        RoleAssignment.objects.filter(user=user)
-        .select_related("role", "scope")
-        .order_by("pk")
+        RoleAssignment.objects.filter(user=user).select_related("role", "scope").order_by("pk")
     )
     role_grants = defaultdict(list)
     for grant in grants.filter(role_id__in=[item.role_id for item in assignments]):

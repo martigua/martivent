@@ -37,9 +37,9 @@ Copied verbatim from the approved spec. Every task's requirements implicitly inc
 
 ```
 martivent/
-├── Dockerfile.dev                 dev container image (python 3.13 + node 24 + uv + zsh)
+├── Dockerfile.dev                 dev container image (python 3.13 + node 24 + uv + fish)
 ├── docker-compose.dev.yml         dev + db services for local work
-├── docker/dev/zshrc               dev shell config
+├── docker/dev/fish/config.fish    dev shell config
 ├── Dockerfile                     multi-stage prod: node build -> python runtime
 ├── docker-compose.yml             web + postgres:16 (prod parity, local)
 ├── railway.json                   Railway deploy config

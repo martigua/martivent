@@ -1,3 +1,19 @@
-from django.shortcuts import render
+from drf_spectacular.utils import OpenApiTypes, extend_schema
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 
-# Create your views here.
+from access.decisions import effective_capabilities
+
+
+@extend_schema(responses=OpenApiTypes.OBJECT)
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def me_view(request):
+    return Response(
+        {
+            "id": request.user.pk,
+            "email": request.user.email,
+            "capabilities": effective_capabilities(request.user),
+        }
+    )

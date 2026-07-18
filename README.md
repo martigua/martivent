@@ -55,8 +55,12 @@ First run builds the image (a few minutes) and starts two containers:
 ### 2. Open a shell inside the container
 
 ```bash
-docker compose -f docker-compose.dev.yml exec dev zsh
+docker compose -f docker-compose.dev.yml exec dev fish
 ```
+
+The shell is **fish**, with a distinct orange `martivent` prompt badge so you
+always know you're inside the container. If you use the `marti` host shortcut
+(see below), just run `marti`.
 
 You land in `/workspace`, which *is* your repo. Confirm the toolchain:
 
@@ -67,10 +71,17 @@ psql --version     # psql (PostgreSQL) 16.x
 ```
 
 Run all project commands (Django, npm, migrations, tests) from this shell.
-`gh`, `rg` (ripgrep), `fd`, and `jq` are preinstalled. You run as the non-root
-`dev` user; for one-off tools use `sudo apt install <pkg>` — but note it's wiped
-on the next `--build`, so anything you want permanently belongs in
+`gh`, `rg` (ripgrep), `fd`, and `jq` are preinstalled. Your personal fish
+git-helper functions (`gaa`, `gc`, `gd`, …) come from the dotfiles submodule; the
+host-only bits (oh-my-fish, rustup) are intentionally not loaded. You run as the
+non-root `dev` user; for one-off tools use `sudo apt install <pkg>` — but note
+it's wiped on the next `--build`, so anything you want permanently belongs in
 `Dockerfile.dev`.
+
+**`marti` shortcut (optional):** a fish function in the dotfiles repo
+(`functions/marti.fish`) opens a container shell from anywhere on the host —
+`marti` for an interactive shell, `marti -c '<cmd>'` for a one-off. It ships in
+your dotfiles, so `git pull` that repo on the host to pick it up.
 
 > **Servers must bind to `0.0.0.0`, not `localhost`, inside the container**, or
 > the port mapping can't reach them from your host browser:

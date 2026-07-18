@@ -14,6 +14,12 @@ services:
         DEV_GID: "${DEV_GID:-1000}"
     volumes:
       - .:/workspace            # your repo, live-mounted: edits on the host appear instantly inside
+      # Host SSH agent, forwarded read-only: `git push` (git@github.com) borrows the
+      # host's loaded keys at runtime. Nothing secret enters the image or container fs.
+      # Falls back to /dev/null when no agent is running on the host (push then fails
+      # loudly instead of the container refusing to start). Container `dev` UID matches
+      # the host UID, so the socket is accessible.
+      - ${SSH_AUTH_SOCK:-/dev/null}:/ssh-agent
       # Neovim plugin/state/cache: survive rebuilds so plugins aren't reinstalled
       # each time, and stay in the container (compiled plugins are arch-specific).
       - nvim-data:/home/dev/.local/share/nvim
@@ -28,6 +34,7 @@ services:
       ALLOWED_HOSTS: localhost,127.0.0.1
       DATABASE_URL: postgres://martivent:martivent@db:5432/martivent
       FEATURES__SELECTION: "false"
+      SSH_AUTH_SOCK: /ssh-agent   # matches the forwarded socket mount above
     depends_on:
       - db
 

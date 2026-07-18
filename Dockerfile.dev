@@ -7,7 +7,7 @@ FROM python:3.13-slim
 # goes in this file instead. ripgrep/fd/jq are baked in as daily-driver tooling.
 RUN apt-get update && apt-get install -y --no-install-recommends \
         git curl postgresql-client ca-certificates fish \
-        sudo ripgrep fd-find jq \
+        sudo ripgrep fd-find jq openssh-client \
         build-essential unzip \
     && rm -rf /var/lib/apt/lists/* \
     && ln -s "$(command -v fdfind)" /usr/local/bin/fd   # Debian names the binary `fdfind`

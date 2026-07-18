@@ -1,0 +1,6 @@
+[submodule "docker/dev/vendor/dotfiles"]
+	path = docker/dev/vendor/dotfiles
+	url = https://github.com/PasNinii/dotfiles.git
+[submodule "docker/dev/vendor/config.nvim"]
+	path = docker/dev/vendor/config.nvim
+	url = https://github.com/PasNinii/config.nvim.git

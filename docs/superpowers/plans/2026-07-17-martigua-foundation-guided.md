@@ -306,41 +306,22 @@ earns it.
 
 ---
 
-## Phase 5: Add feature flags as their own generated app
+## Phase 5: Authorization and feature variants
 
-### Gate 5.1: Generate `features`
+The original global Boolean flag design was rejected after working through
+real backend and Angular authorization examples. Phase 5 now follows the
+[Access Control and Feature Variants plan](2026-07-18-access-and-feature-variants.md).
 
-The user runs:
+Review happens at two useful boundaries:
 
-```bash
-uv run python manage.py startapp features
-```
+- [ ] **Phase 5A:** scoped additive authorization using native Django
+      permissions, users, roles, organizational groups, and exact targets.
+- [ ] **Phase 5B:** named feature variants with ordered user, role, group, and
+      global audiences, composed with authorization where backend behavior is
+      gated.
 
-- [ ] Review untouched generated boilerplate before customization.
-- [ ] Register the app only after it exists.
-
-### Gate 5.2: Add developer-owned environment flags
-
-- [ ] Extend `config/env.py` in a separate review gate.
-- [ ] Keep unfinished-code flags separate from bureau-controlled visibility.
-
-### Gate 5.3: Add `SectionVisibility`
-
-- [ ] Add and review the model.
-- [ ] Propose model tests before writing them.
-- [ ] User generates and reviews the migration before applying it.
-
-### Gate 5.4: Add evaluation and cache behavior
-
-- [ ] Add one behavior at a time: database lookup, environment hard-off,
-      caching, invalidation.
-- [ ] Propose a focused test before each behavior.
-
-### Gate 5.5: Add backend adapters and `/api/flags/`
-
-- [ ] Add the DRF permission, plain-view decorator, and endpoint as separate
-      review gates.
-- [ ] Disabled features return 404.
+The user runs generators, migrations, checks, tests, and linters. The agent
+implements all code within a phase before asking for the phase review.
 
 ---
 

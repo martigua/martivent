@@ -1,7 +1,7 @@
 # Martigua Handball — Sub-project 1: Foundation
 
 **Date:** 2026-07-17
-**Status:** Design approved, pending spec review
+**Status:** Revised design approved
 **Repo:** `github.com/martigua/martivent`
 
 ## Context
@@ -50,7 +50,7 @@ built in order. Each gets its own spec, plan, and implementation cycle.
 
 |#|Sub-project|Delivers|
 |-|-----------|--------|
-|1|**Foundation** (this spec)|Docker, Django skeleton, custom User model, design system, feature flags, CI, Railway deploy|
+|1|**Foundation** (this spec)|Docker, Django skeleton, custom User model, authorization, feature variants, design system, CI, Railway deploy|
 |2|Public site|Hero, actualités, équipes, agenda, histoire, bureau, tarifs, infos pratiques, contact|
 |3|Member portal|Auth flows, profil, enfants, documents, présences, mon équipe, notifications, messages|
 |4|Coach workflow|Dispos, sélection, match import, table de marque planning|
@@ -72,8 +72,10 @@ Foundation is done when all of the following are true:
 - Merging to `main` deploys to Railway without human action.
 - `docker compose up` produces an environment matching production.
 - One page renders, composed only of design-system components.
-- One feature flag is toggleable in the Django admin and observably hides a
-  nav item in Angular.
+- One feature variant is assignable in the Django admin and observably changes
+  a nav item in Angular.
+- One capability is assignable to a user and enforced by both Django and
+  Angular.
 - `pytest` passes locally and in CI.
 
 ## Stack
@@ -85,7 +87,8 @@ Foundation is done when all of the following are true:
 |API schema|`drf-spectacular`, generating TypeScript types for Angular|
 |Validation|DRF serializers at the HTTP boundary; Pydantic for custom endpoints; `pydantic-settings` for env config|
 |Auth|`django.contrib.auth` + `django-allauth` (password and Google, both in V1)|
-|Feature flags|`Features` (pydantic-settings, env-driven) plus `SectionVisibility` (database, admin-driven)|
+|Authorization|Django `Permission` capabilities plus scoped, additive grants|
+|Feature flags|Database-backed, audience-targeted named variants|
 |Database|Postgres 16, Django ORM and migrations|
 |Admin|Django admin|
 |Static serving|Whitenoise|
@@ -185,7 +188,8 @@ martivent/
 │   ├── uv.lock              committed lockfile
 │   ├── config/              settings, urls, wsgi
 │   ├── accounts/            User model, allauth config
-│   ├── features/            flags: model, evaluator, adapters, API
+│   ├── access/              capabilities, roles, scoped grants, evaluator
+│   ├── features/            variants, audience rules, evaluator, API
 │   └── manage.py
 ├── frontend/                Angular workspace (package.json, src/)
 │   ├── src/styles/          design tokens
@@ -199,9 +203,9 @@ martivent/
 
 ## Data model
 
-Foundation defines exactly two models. Everything else ships with the
-sub-project that needs it — designing `dispos` before designing the dispos
-workflow would be guessing at fields.
+Foundation defines the access-control and feature-delivery mechanisms used by
+later sub-projects. Domain models still ship only with the sub-project that
+needs them; designing `dispos` before the workflow would be guessing at fields.
 
 ### `accounts.User`
 
@@ -212,82 +216,133 @@ sub-project 3.
 
 Subclasses `AbstractUser`. Email is the login identifier. No profile fields yet.
 
-### `features.SectionVisibility`
+### Authorization models
 
-```
-key          SlugField, unique     e.g. "adhesion"
-enabled      BooleanField          default False
-label        CharField             human name shown in admin
-help_text    TextField, blank      what this controls, for the bureau
-```
+Django's native `auth.Permission` rows are the capability registry. Standard
+model permissions supply CRUD capabilities; custom permissions declare
+navigation, feature, endpoint-level business actions, and protected fields.
+Definitions originate in backend code and are synchronized by Django
+migrations. Administrators assign them but do not invent capability strings.
 
-Registered in Django admin. This is the bureau's control surface.
+The access application adds only the structure Django does not provide:
 
-## Feature flags
+- `Role`: a reusable named responsibility such as Coach or Treasurer.
+- `RoleAssignment`: assigns a role to a user, optionally within one scope.
+- `OrganizationalGroup`: a collection such as U18, with user membership.
+- `Grant`: links one permission to exactly one recipient: user, role, or
+  organizational group. It may also carry a scope and an exact target.
 
-Two layers, deliberately separate mechanisms.
+Scope and target references use Django content types so later domain models can
+participate without changing the access schema. A resource-specific resolver
+states how an object belongs to a scope; there is no generic expression
+language.
 
-|Layer|Audience|Storage|Lifetime|Purpose|
-|-----|--------|-------|--------|-------|
-|`Features`|Developer|Railway env vars|Deleted when the feature ships|Ship unfinished work to prod, switched off|
-|`SectionVisibility`|Bureau|Database, via admin|Permanent|Club controls which sections of the site are live|
+All grants are additive. There are no deny grants. The effective result is the
+union of direct, role, and organizational-group sources. Removing a role or
+group removes only that source; the same permission granted directly remains.
+For a role-derived grant, both the role assignment's scope and the grant's
+scope must cover the request; omitting either scope means it adds no further
+restriction. This lets Alice be Coach for U18 without making her Coach
+club-wide.
+If only a subset should receive a permission, that subset is represented and
+granted explicitly instead of granting broadly and subtracting exceptions.
 
-They are separate because a half-built feature must not be toggleable by a club
-treasurer. If unfinished work shared a table with "show the Adhésion section",
-someone flips it on a Tuesday and members hit broken pages. Different audiences,
-different blast radius, different lifetimes.
+### Feature models
 
-### Evaluation
+- `Feature`: a stable key, description, allowed variant names, and default
+  variant.
+- `FeatureRule`: an ordered audience match and its selected variant. An
+  audience is everyone, one user, one role, or one organizational group.
 
-One evaluator, three adapters:
+The first matching rule wins; otherwise the feature's default variant is used.
+Rules are deliberately limited to these audience types. V1 has no percentage
+rollout, arbitrary condition language, or environment column. Each deployed
+environment has its own database and therefore its own configuration.
 
-```python
-# features/flags.py
-def is_enabled(key: str) -> bool:
-    env = settings.FEATURES.model_dump()
-    if key in env and env[key] is False:
-        return False                        # env off is a hard off; DB cannot override
-    return _db_flags().get(key, False)
+## Authorization
 
-def _db_flags() -> dict[str, bool]:
-    flags = cache.get(_CACHE_KEY)
-    if flags is None:
-        flags = dict(SectionVisibility.objects.values_list("key", "enabled"))
-        cache.set(_CACHE_KEY, flags, 300)
-    return flags
-```
+A permission answers **what** may be done. A grant answers **who**, **where**,
+and optionally **to which exact record**:
 
-Cache is invalidated by a `post_save` signal on `SectionVisibility`, so the
-bureau's toggle feels instant without querying flags on every request.
-
-Adapters:
-
-```python
-def feature_required(key):                  # DRF viewsets
-    class _FeatureEnabled(BasePermission):
-        def has_permission(self, request, view):
-            return is_enabled(key)
-    return _FeatureEnabled
-
-def requires_feature(key):                  # custom function views
-    def deco(fn):
-        @wraps(fn)
-        def wrapper(request, *args, **kwargs):
-            if not is_enabled(key):
-                raise Http404
-            return fn(request, *args, **kwargs)
-        return wrapper
-    return deco
+```text
+recipient + capability + scope + target
 ```
 
-`GET /api/flags/` returns the merged map for Angular's route guards, using the
-same evaluator, so frontend and backend cannot disagree about what is on.
+Examples:
 
-**Disabled features return 404, not 403.** A 403 announces that an endpoint
-exists and is forbidden, which for half-built code in production is an
-invitation. A 404 says nothing.
+- Coach role + `player:update` + U18 scope.
+- Alice + `player:medical_notes:read` + U18 scope.
+- Alice + `person:update` + Bob as exact target.
+- Treasurer role + `navigation:administration:view` + club scope.
 
-Foundation ships the mechanism plus one throwaway flag proving both layers work.
+For an U18 coach editing an U18 player, the request must have
+`player:update`, the grant must cover the U18 scope, and the target must resolve
+as an U18 player. Being a coach is a source of the capability, not a hard-coded
+endpoint condition. This means the same endpoint also works for a direct grant
+or another role without rewriting its policy.
+
+Ordinary field writes follow the entity-level update permission. A protected
+field additionally requires its field permission, for example:
+
+```text
+player:update AND player:medical_notes:write
+```
+
+If a request submits any unauthorized field, the entire request is rejected.
+Reads omit unauthorized protected fields from the serializer. Querysets are
+filtered to accessible records before object lookup, so an inaccessible object
+returns 404. An authenticated request lacking an action permission returns 403.
+Django superusers bypass grant evaluation.
+
+DRF exposes small composable policies such as `HasCapability`,
+`FeatureVariant`, and resource-specific scope/target checks. Views compose
+these policies rather than checking role or group names. The backend remains
+authoritative.
+
+Angular receives:
+
+- effective global capabilities and their grant sources with the current user;
+- contextual allowed actions with page or resource data;
+- evaluated feature variants, never the feature-rule configuration.
+
+Angular route guards and UI directives use the same capability names to hide
+unavailable navigation and actions. This improves the interface but is not a
+security boundary; every protected operation is checked again by Django.
+Roles and groups may be returned for display and administration, not used as
+the normal frontend authorization API.
+
+## Feature variants
+
+Feature variants control availability or select between implementations:
+
+```text
+button_design = legacy | v2
+dashboard = legacy | v2 | experimental
+```
+
+They remain separate from authorization:
+
+```text
+visible or allowed = selected feature variant AND required capability
+```
+
+A feature variant may decide which dashboard implementation Angular renders.
+The `dashboard:view` capability decides whether the user may access a dashboard
+at all. A feature rule never grants access to protected data or actions.
+
+The backend evaluates variants from the authenticated user's identity, roles,
+and organizational groups. `GET /api/me/` returns variants needed throughout
+the application. A contextual page endpoint may return additional variants and
+allowed actions when they depend on that page's scope.
+
+Purely visual variants need only a frontend gate. When a variant exposes an
+unfinished endpoint or changes backend behavior, Django checks the variant too.
+An endpoint hidden because its variant is unavailable returns 404.
+
+Foundation ships the mechanism and one temporary variant proving backend
+evaluation, Angular consumption, and administration. Temporary flags are
+removed after rollout; permanent operational variants must be explicitly
+documented rather than silently becoming stale flags.
 
 ## Design system
 
@@ -372,7 +427,7 @@ Pydantic does not query. The ORM queries; Pydantic types the result.
 Custom endpoints get `@extend_schema` annotations so `drf-spectacular` includes
 them in the OpenAPI document, which generates Angular's TypeScript interfaces.
 
-## Auth
+## Authentication
 
 `django.contrib.auth` with `django-allauth`, providing password login and Google
 login, both in V1, from one user model.
@@ -423,7 +478,10 @@ Railway can still introduce.
 
 ## Error handling
 
-- **Disabled feature:** 404, per the reasoning above.
+- **Unavailable feature variant:** 404 when the backend endpoint is gated by
+  that variant.
+- **Authenticated but unauthorized action:** 403.
+- **Inaccessible target object:** 404 after the authorized queryset is filtered.
 - **Unauthenticated API request:** 403 from DRF. Angular's interceptor redirects
   to login.
 - **Validation failure:** DRF's standard 400 error shape. Custom endpoints using
@@ -441,12 +499,18 @@ No bare `except:` and no catch-all log-and-continue anywhere.
 `pytest` with `pytest-django`. No `factory_boy` yet — Django fixtures cover a
 skeleton; it can be added when the model graph justifies it.
 
-Foundation's own tests are thin by design, since Foundation has no features:
+Foundation tests the mechanism rather than imaginary club workflows:
 
-- `GET /api/flags/` returns the merged env-plus-database map.
-- Env `False` masks database `True`.
-- A disabled feature returns 404 through both the permission and the decorator.
-- The `SectionVisibility` cache is invalidated on save.
+- Direct, role, and organizational-group grants combine additively.
+- Removing one grant source preserves equivalent permission from another.
+- Scope and exact-target grants accept matching objects and reject others.
+- Protected reads omit fields and protected writes reject the whole request.
+- The current-user API returns effective capabilities with provenance.
+- Feature rules choose the first matching audience and otherwise use the
+  default variant.
+- The current-user API returns evaluated variants, not rule configuration.
+- A backend endpoint gated by an unavailable variant returns 404.
+- A combined feature-and-capability policy requires both conditions.
 - Password login and logout work.
 - Health check responds.
 

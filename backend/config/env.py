@@ -1,16 +1,24 @@
 from urllib.parse import unquote, urlparse
 
-from pydantic import PostgresDsn
+from pydantic import BaseModel, Field, PostgresDsn
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
+class FeatureFlags(BaseModel):
+    selection: bool = False
+
+
 class Env(BaseSettings):
-    model_config = SettingsConfigDict(case_sensitive=False)
+    model_config = SettingsConfigDict(
+        case_sensitive=False,
+        env_nested_delimiter="__",
+    )
 
     secret_key: str
     debug: bool
     allowed_hosts: str
     database_url: PostgresDsn
+    features: FeatureFlags = Field(default_factory=FeatureFlags)
 
     @property
     def hosts(self) -> list[str]:

@@ -22,3 +22,8 @@ PROMPT='%F{green}%n@martivent%f %F{blue}%~%f${vcs_info_msg_0_} %# '
 setopt AUTO_CD                        # `foo/` instead of `cd foo/`
 alias ll='ls -lah --color=auto'
 alias gs='git status'
+
+# Personal aliases from the dotfiles submodule (guarded: absent on a checkout
+# without submodules). Sourced last so its definitions win over the above.
+[ -f /workspace/docker/dev/vendor/dotfiles/.aliases ] \
+    && source /workspace/docker/dev/vendor/dotfiles/.aliases

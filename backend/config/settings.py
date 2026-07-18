@@ -28,6 +28,7 @@ SECRET_KEY = env.secret_key
 DEBUG = env.debug
 
 ALLOWED_HOSTS = env.hosts
+FEATURES = env.features
 
 
 # Application definition
@@ -42,6 +43,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'drf_spectacular',
     'accounts.apps.AccountsConfig',
+    'features.apps.FeaturesConfig',
 ]
 
 MIDDLEWARE = [

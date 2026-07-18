@@ -2,9 +2,36 @@
 # as CI and production, so "works here" means "works in prod".
 FROM python:3.13-slim
 
+# sudo is the escape hatch: dev stays non-root by default (prod-like), but can
+# install one-off tools that vanish on the next rebuild. Anything worth keeping
+# goes in this file instead. ripgrep/fd/jq are baked in as daily-driver tooling.
 RUN apt-get update && apt-get install -y --no-install-recommends \
         git curl postgresql-client ca-certificates zsh \
+        sudo ripgrep fd-find jq \
+        build-essential unzip \
+    && rm -rf /var/lib/apt/lists/* \
+    && ln -s "$(command -v fdfind)" /usr/local/bin/fd   # Debian names the binary `fdfind`
+
+# GitHub CLI isn't in Debian's repos; add its official signed apt source.
+RUN curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg \
+        -o /usr/share/keyrings/githubcli-archive-keyring.gpg \
+    && chmod go+r /usr/share/keyrings/githubcli-archive-keyring.gpg \
+    && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" \
+        > /etc/apt/sources.list.d/github-cli.list \
+    && apt-get update && apt-get install -y --no-install-recommends gh \
     && rm -rf /var/lib/apt/lists/*
+
+# Neovim (latest stable) from the official release tarball — Debian's package is
+# too old for LazyVim. Arch-aware so the image builds on amd64 and arm64 hosts.
+RUN arch="$(dpkg --print-architecture)" \
+    && case "$arch" in \
+         amd64) nvim_arch="x86_64" ;; \
+         arm64) nvim_arch="arm64" ;; \
+         *) echo "unsupported arch for neovim: $arch" >&2 && exit 1 ;; \
+       esac \
+    && curl -fsSL "https://github.com/neovim/neovim/releases/latest/download/nvim-linux-${nvim_arch}.tar.gz" \
+        | tar -xz -C /opt \
+    && ln -s "/opt/nvim-linux-${nvim_arch}/bin/nvim" /usr/local/bin/nvim
 
 # Debian's packaged Node is too old for Angular; pull Node 24 (active LTS) from NodeSource.
 RUN curl -fsSL https://deb.nodesource.com/setup_24.x | bash - \
@@ -25,13 +52,28 @@ ARG DEV_UID=1000
 ARG DEV_GID=1000
 RUN groupadd --gid "${DEV_GID}" dev \
     && useradd --uid "${DEV_UID}" --gid "${DEV_GID}" \
-        --create-home --shell /usr/bin/zsh dev
+        --create-home --shell /usr/bin/zsh dev \
+    && echo 'dev ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/dev \
+    && chmod 0440 /etc/sudoers.d/dev
 
 # zsh as the interactive shell, with a small self-contained config.
 COPY --chown=dev:dev docker/dev/zshrc /home/dev/.zshrc
 
 WORKDIR /workspace
 USER dev
+
+# Point Neovim at the config.nvim submodule (checked out on the bind-mounted
+# workspace). The target is empty until the repo mounts at runtime — the symlink
+# itself is what we bake in. Plugin data stays in ~/.local/share (container fs):
+# compiled plugins are Linux-arch-specific and must not leak to the host.
+# Pre-create nvim's data dirs as `dev` so the named volumes mounted over them
+# inherit dev ownership (Docker copies the image path's ownership onto a fresh
+# volume; without this the mountpoints default to root and nvim can't write).
+RUN mkdir -p /home/dev/.config \
+             /home/dev/.local/share/nvim \
+             /home/dev/.local/state/nvim \
+             /home/dev/.cache/nvim \
+    && ln -s /workspace/docker/dev/vendor/config.nvim /home/dev/.config/nvim
 
 # No app process yet — keep the container alive so `docker compose exec` can attach.
 CMD ["sleep", "infinity"]

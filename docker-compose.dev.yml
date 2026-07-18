@@ -14,6 +14,11 @@ services:
         DEV_GID: "${DEV_GID:-1000}"
     volumes:
       - .:/workspace            # your repo, live-mounted: edits on the host appear instantly inside
+      # Neovim plugin/state/cache: survive rebuilds so plugins aren't reinstalled
+      # each time, and stay in the container (compiled plugins are arch-specific).
+      - nvim-data:/home/dev/.local/share/nvim
+      - nvim-state:/home/dev/.local/state/nvim
+      - nvim-cache:/home/dev/.cache/nvim
     ports:
       - "8001:8000"             # host:container — Django (host 8001; 8000 was taken)
       - "4201:4200"             # host:container — Angular dev server (host 4201; 4200 was taken)
@@ -22,6 +27,7 @@ services:
       DEBUG: "true"
       ALLOWED_HOSTS: localhost,127.0.0.1
       DATABASE_URL: postgres://martivent:martivent@db:5432/martivent
+      FEATURES__SELECTION: "false"
     depends_on:
       - db
 
@@ -38,3 +44,6 @@ services:
 
 volumes:
   pgdata:
+  nvim-data:
+  nvim-state:
+  nvim-cache:

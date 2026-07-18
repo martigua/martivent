@@ -27,6 +27,20 @@ We develop inside a Linux container so your environment matches CI and
 production. You edit files with any editor on your host; the container sees them
 live through a bind mount.
 
+The dev shell (dotfiles/aliases) and the bundled Neovim config live in git
+submodules under `docker/dev/vendor/`. Clone with them, or pull them after the
+fact:
+
+```bash
+git clone --recurse-submodules <repo-url>
+# or, in an existing checkout:
+git submodule update --init --recursive
+```
+
+Neovim (`nvim`) is preinstalled and preconfigured; the first launch bootstraps
+its plugins (one-time, needs network). Skipping the submodules is harmless — the
+aliases and nvim config simply won't be present.
+
 ### 1. Start the environment
 
 ```bash
@@ -53,6 +67,10 @@ psql --version     # psql (PostgreSQL) 16.x
 ```
 
 Run all project commands (Django, npm, migrations, tests) from this shell.
+`gh`, `rg` (ripgrep), `fd`, and `jq` are preinstalled. You run as the non-root
+`dev` user; for one-off tools use `sudo apt install <pkg>` — but note it's wiped
+on the next `--build`, so anything you want permanently belongs in
+`Dockerfile.dev`.
 
 > **Servers must bind to `0.0.0.0`, not `localhost`, inside the container**, or
 > the port mapping can't reach them from your host browser:

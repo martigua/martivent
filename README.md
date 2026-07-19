@@ -44,8 +44,8 @@ npm start
 ```
 
 Open `http://localhost:4201/`. Django is exposed at
-`http://localhost:8001/`; Angular proxies `/api` and `/accounts` to it inside
-the development container.
+`http://localhost:8001/`; Angular proxies `/api`, `/_allauth`, and `/accounts`
+to it inside the development container.
 
 Run all checks:
 

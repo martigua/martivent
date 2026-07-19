@@ -4,7 +4,7 @@ dl {
   background: var(--mg-stat-band-divider-color, var(--border-default));
   display: grid;
   gap: var(--mg-stat-band-divider-width, var(--border-width-thin));
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: 1fr;
   margin: 0;
   overflow: hidden;
 }
@@ -13,7 +13,7 @@ div {
   background: var(--mg-stat-band-background, var(--surface-raised));
   display: flex;
   flex-direction: column;
-  padding: var(--mg-stat-band-padding, clamp(var(--space-5), 4vw, var(--space-8)));
+  padding: var(--mg-stat-band-padding, var(--panel-padding));
   text-align: var(--mg-stat-band-alignment, center);
 }
 
@@ -28,8 +28,8 @@ dt {
   order: 2;
 }
 
-@media (max-width: breakpoints.$mobile) {
+@media (min-width: breakpoints.$tablet) {
   dl {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }

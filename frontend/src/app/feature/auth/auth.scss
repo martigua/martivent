@@ -1,0 +1,29 @@
+form {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.error {
+  color: var(--red-500);
+}
+
+.success {
+  color: var(--green-400);
+}
+
+.secondary-action {
+  color: var(--text-muted);
+  margin-top: var(--space-6);
+
+  a {
+    color: var(--text-primary);
+    font-weight: var(--font-weight-semibold);
+    text-underline-offset: var(--space-2);
+  }
+}
+
+.provider {
+  border-top: var(--border-width-thin) solid var(--border-default);
+  margin-top: var(--space-6);
+  padding-top: var(--space-6);
+}

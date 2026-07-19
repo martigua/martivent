@@ -177,6 +177,9 @@ wheels = [
 ]
 
 [package.optional-dependencies]
+headless = [
+    { name = "pyjwt", extra = ["crypto"] },
+]
 socialaccount = [
     { name = "oauthlib" },
     { name = "pyjwt", extra = ["crypto"] },
@@ -302,7 +305,7 @@ version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
     { name = "django" },
-    { name = "django-allauth", extra = ["socialaccount"] },
+    { name = "django-allauth", extra = ["headless", "socialaccount"] },
     { name = "djangorestframework" },
     { name = "drf-spectacular" },
     { name = "gunicorn" },
@@ -322,7 +325,7 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "django", specifier = ">=5.2,<5.3" },
-    { name = "django-allauth", extras = ["socialaccount"], specifier = ">=65,<66" },
+    { name = "django-allauth", extras = ["headless", "socialaccount"], specifier = ">=65,<66" },
     { name = "djangorestframework", specifier = ">=3.16,<4" },
     { name = "drf-spectacular", specifier = ">=0.28,<1" },
     { name = "gunicorn", specifier = ">=23,<25" },

@@ -55,4 +55,26 @@ describe('CurrentUser', () => {
     expect(service.loaded()).toBe(true);
     expect(service.user()).toBeNull();
   });
+
+  it('can reload app identity after an authentication change', async () => {
+    TestBed.tick();
+    http.expectOne('/api/me/').flush(null, {
+      status: 403,
+      statusText: 'Forbidden',
+    });
+    await TestBed.inject(ApplicationRef).whenStable();
+
+    service.reload();
+    TestBed.tick();
+    http.expectOne('/api/me/').flush({
+      id: 7,
+      email: 'member@martigua.fr',
+      is_validated: false,
+      capabilities: {},
+      features: {},
+    });
+    await TestBed.inject(ApplicationRef).whenStable();
+
+    expect(service.user()?.email).toBe('member@martigua.fr');
+  });
 });

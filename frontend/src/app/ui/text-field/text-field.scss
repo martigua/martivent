@@ -1,0 +1,38 @@
+:host {
+  display: grid;
+  gap: var(--space-2);
+}
+
+label {
+  display: grid;
+  font-weight: var(--mg-text-field-label-weight, var(--font-weight-semibold));
+  gap: var(--mg-text-field-gap, var(--space-2));
+}
+
+input {
+  background: var(--mg-text-field-background, var(--surface-interactive));
+  border: var(--border-width-thin) solid var(--mg-text-field-border-color, var(--border-default));
+  border-radius: var(--mg-text-field-radius, var(--radius-sm));
+  color: var(--mg-text-field-color, var(--text-primary));
+  padding: var(--mg-text-field-padding-block, var(--space-3))
+    var(--mg-text-field-padding-inline, var(--space-4));
+
+  &:focus-visible {
+    border-color: var(--mg-text-field-focus-border-color, var(--border-emphasis));
+    outline: var(--focus-ring-width) solid var(--focus-ring-color);
+    outline-offset: var(--focus-ring-offset);
+  }
+}
+
+.error {
+  color: var(--mg-text-field-error-color, var(--red-500));
+  font-size: var(--type-small-size);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  input {
+    transition:
+      background-color var(--motion-duration-fast) var(--motion-easing-standard),
+      border-color var(--motion-duration-fast) var(--motion-easing-standard);
+  }
+}

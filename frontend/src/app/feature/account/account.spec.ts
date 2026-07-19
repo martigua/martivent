@@ -1,8 +1,10 @@
 import { signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
+import { of } from 'rxjs';
 
 import { CurrentUser, SessionUser } from '../../core/current-user';
+import { HeadlessAuthentication } from '../../core/headless-authentication';
 import { Account } from './account';
 
 describe('Account', () => {
@@ -25,6 +27,12 @@ describe('Account', () => {
             loaded,
           },
         },
+        {
+          provide: HeadlessAuthentication,
+          useValue: {
+            logout: () => of(undefined),
+          },
+        },
       ],
     }).compileComponents();
 
@@ -40,8 +48,8 @@ describe('Account', () => {
 
     expect(page.querySelector('h1')?.textContent).toContain('Mon compte');
     expect(page.textContent).toContain('Connectez-vous');
-    expect(destinations).toContain('/accounts/login/');
-    expect(destinations).toContain('/accounts/signup/');
+    expect(destinations).toContain('/auth/login');
+    expect(destinations).toContain('/auth/signup');
   });
 
   it('shows the signed-in account and pending administrator validation', async () => {
@@ -62,9 +70,9 @@ describe('Account', () => {
     expect(page.textContent).toContain('member@martigua.fr');
     expect(page.textContent).toContain('En attente de validation');
     expect(page.textContent).toContain('Un administrateur doit valider votre compte');
-    expect(destinations).toContain('/accounts/email/');
-    expect(destinations).toContain('/accounts/password/change/');
-    expect(destinations).toContain('/accounts/logout/');
+    expect(destinations).toContain('/account/email');
+    expect(destinations).toContain('/account/password');
+    expect(page.querySelector('button')?.textContent).toContain('Se déconnecter');
   });
 
   it('shows administrator validation when the account is validated', async () => {

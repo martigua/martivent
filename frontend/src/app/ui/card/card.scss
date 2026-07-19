@@ -10,5 +10,5 @@ article {
   border-radius: var(--mg-card-radius, var(--radius-md));
   box-shadow: var(--mg-card-shadow, var(--elevation-card));
   color: var(--mg-card-color, var(--text-primary));
-  padding: var(--mg-card-padding, clamp(var(--space-5), 4vw, var(--space-8)));
+  padding: var(--mg-card-padding, var(--panel-padding));
 }

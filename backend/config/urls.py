@@ -30,6 +30,7 @@ urlpatterns = [
     path("healthz", healthz, name="healthz"),
     path("admin/", admin.site.urls),
     path("accounts/", include("allauth.urls")),
+    path("_allauth/", include("allauth.headless.urls")),
     path("api/context/", application_context_view, name="application-context"),
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
     path("api/", include("accounts.urls")),

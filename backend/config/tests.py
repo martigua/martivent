@@ -166,6 +166,7 @@ def test_application_context_is_public_and_backend_owned(client):
     response = client.get("/api/context/")
 
     assert response.status_code == 200
+    assert response.cookies["csrftoken"]["httponly"] == ""
     assert response.json() == {
         "club": {
             "name": "Martigua Sports Culture Loisirs",

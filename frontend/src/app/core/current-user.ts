@@ -22,6 +22,10 @@ export class CurrentUser {
   readonly user = computed(() => (this.userResource.hasValue() ? this.userResource.value() : null));
   readonly loaded = computed(() => !this.userResource.isLoading());
 
+  reload(): void {
+    this.userResource.reload();
+  }
+
   hasCapability(capability: string): Signal<boolean> {
     return computed(() => capability in (this.user()?.capabilities ?? {}));
   }

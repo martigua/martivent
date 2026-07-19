@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "allauth",
     "allauth.account",
+    "allauth.headless",
     "rest_framework",
     "drf_spectacular",
     "accounts.apps.AccountsConfig",
@@ -101,6 +102,15 @@ AUTHENTICATION_BACKENDS = [
 ACCOUNT_USER_MODEL_USERNAME_FIELD = None
 ACCOUNT_SIGNUP_FIELDS = ["email*", "password1*", "password2*"]
 ACCOUNT_LOGIN_METHODS = {"email"}
+HEADLESS_ONLY = True
+HEADLESS_CLIENTS = ("browser",)
+HEADLESS_FRONTEND_URLS = {
+    "account_confirm_email": "/auth/email/verify/{key}",
+    "account_reset_password": "/auth/password",
+    "account_reset_password_from_key": "/auth/password/reset/{key}",
+    "account_signup": "/auth/signup",
+    "socialaccount_login_error": "/auth/provider/callback",
+}
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/"
 

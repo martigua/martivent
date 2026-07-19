@@ -52,14 +52,23 @@ when its responsibility becomes part of the backend architecture.
 | --- | --- |
 | `GET /healthz` | Liveness check |
 | `/admin/` | Django administration |
-| `/accounts/` | Public signup, login/logout, password reset, email management, reauthentication, and optional Google login |
-| `GET /api/context/` | Public club, display-stat, and authentication context |
+| `/_allauth/browser/v1/` | Browser-only Headless Allauth lifecycle API |
+| `/accounts/<provider>/` | Optional social-provider redirects and callbacks |
+| `GET /api/context/` | Public club, display-stat, authentication context, and anonymous CSRF-cookie seed |
 | `GET /api/schema/` | Generated OpenAPI schema |
 | `GET /api/me/` | Authenticated user, administrator-validation state, effective capabilities, and feature variants |
 
-The API currently uses Django session authentication. The backend is the
-authority for every protected action. Client-side capability and feature checks
-control presentation only.
+Angular presents account forms while Allauth Headless owns signup, login,
+logout, password reset and change, email verification and management, social
+login, sessions, CSRF, and rate limits. Both the Headless endpoints and the API
+use the same same-origin Django session cookie. The application does not expose
+Allauth's token-oriented app client.
+
+`GET /api/me/` remains the application identity and authorization source. Do
+not add validation state, capabilities, or feature variants to Allauth's
+authentication-session representation. The backend is the authority for every
+protected action; client-side capability and feature checks control
+presentation only.
 
 Public signup creates an active but unvalidated account. Account validation is
 a global administrator-controlled status, independent of email verification,
@@ -78,9 +87,11 @@ Choose the narrowest backend boundary an operation needs:
 substitutes for an action capability, and a feature variant never grants one.
 
 `GET /api/context/` is the frontend's single source for general application
-data. Its ordered `club.stats` entries include both labels and values so the
-frontend only renders them. The current club values are backend constants;
-the serializer-backed response is also represented in the OpenAPI schema.
+data. It also ensures that anonymous browsers receive Django's readable
+`csrftoken` cookie before their first Headless POST. Its ordered `club.stats`
+entries include both labels and values so the frontend only renders them. The
+current club values are backend constants; the serializer-backed response is
+also represented in the OpenAPI schema.
 
 The Django admin uses a small backend-owned subset of the design-system tokens.
 It intentionally does not depend on Angular assets.

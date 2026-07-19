@@ -4,6 +4,7 @@ from django.contrib import admin
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AnonymousUser, Permission
 from django.db import IntegrityError, transaction
+from django.test import Client as DjangoClient
 from django.test import RequestFactory
 from django.urls import NoReverseMatch, reverse
 
@@ -73,57 +74,101 @@ def test_superuser_flags_are_enforced():
         )
 
 
+def test_headless_browser_client_is_the_only_headless_client(client):
+    assert client.get("/_allauth/browser/v1/config").status_code == 200
+    assert client.get("/_allauth/app/v1/config").status_code == 404
+
+
+def test_account_links_target_the_angular_application():
+    assert settings.HEADLESS_FRONTEND_URLS == {
+        "account_confirm_email": "/auth/email/verify/{key}",
+        "account_reset_password": "/auth/password",
+        "account_reset_password_from_key": "/auth/password/reset/{key}",
+        "account_signup": "/auth/signup",
+        "socialaccount_login_error": "/auth/provider/callback",
+    }
+
+
 @pytest.mark.django_db
-def test_password_login_creates_session(client):
+def test_headless_password_login_and_logout_share_the_api_session():
     user = get_user_model().objects.create_user(
         email="member@martigua.fr",
         password="pw12345!",
     )
+    browser = DjangoClient(enforce_csrf_checks=True)
+    context_response = browser.get("/api/context/")
+    csrf_token = context_response.cookies["csrftoken"].value
 
-    response = client.post(
-        "/accounts/login/",
-        {"login": "MEMBER@MARTIGUA.FR", "password": "pw12345!"},
+    login_response = browser.post(
+        "/_allauth/browser/v1/auth/login",
+        {"email": "MEMBER@MARTIGUA.FR", "password": "pw12345!"},
+        content_type="application/json",
+        HTTP_X_CSRFTOKEN=csrf_token,
     )
 
-    assert response.status_code == 302
-    assert response.headers["Location"] == "/"
-    assert client.get("/api/me/").json()["email"] == user.email
+    assert login_response.status_code == 200
+    assert browser.get("/api/me/").json()["email"] == user.email
+    csrf_token = browser.cookies["csrftoken"].value
 
+    logout_response = browser.delete(
+        "/_allauth/browser/v1/auth/session",
+        HTTP_X_CSRFTOKEN=csrf_token,
+    )
 
-def test_public_signup_is_available(client):
-    response = client.get("/accounts/signup/")
-
-    assert response.status_code == 200
+    assert logout_response.status_code == 401
+    assert browser.get("/api/me/").status_code == 403
 
 
 @pytest.mark.django_db
-def test_password_login_rejects_invalid_password(client):
+def test_headless_password_login_requires_csrf():
+    get_user_model().objects.create_user(
+        email="member@martigua.fr",
+        password="pw12345!",
+    )
+    browser = DjangoClient(enforce_csrf_checks=True)
+    browser.get("/api/context/")
+
+    response = browser.post(
+        "/_allauth/browser/v1/auth/login",
+        {"email": "member@martigua.fr", "password": "pw12345!"},
+        content_type="application/json",
+    )
+
+    assert response.status_code == 403
+    assert browser.get("/api/me/").status_code == 403
+
+
+@pytest.mark.django_db
+def test_headless_signup_creates_an_unvalidated_account(client):
+    response = client.post(
+        "/_allauth/browser/v1/auth/signup",
+        {
+            "email": "new-member@martigua.fr",
+            "password": "A-safe-password-2026",
+        },
+        content_type="application/json",
+    )
+
+    assert response.status_code == 200
+    user = get_user_model().objects.get(email="new-member@martigua.fr")
+    assert user.is_validated is False
+    assert client.get("/api/me/").json()["email"] == user.email
+
+
+@pytest.mark.django_db
+def test_headless_password_login_rejects_invalid_password(client):
     get_user_model().objects.create_user(
         email="member@martigua.fr",
         password="pw12345!",
     )
 
     response = client.post(
-        "/accounts/login/",
-        {"login": "member@martigua.fr", "password": "wrong"},
+        "/_allauth/browser/v1/auth/login",
+        {"email": "member@martigua.fr", "password": "wrong"},
+        content_type="application/json",
     )
 
-    assert response.status_code == 200
-    assert client.get("/api/me/").status_code == 403
-
-
-@pytest.mark.django_db
-def test_logout_ends_session(client):
-    user = get_user_model().objects.create_user(
-        email="member@martigua.fr",
-        password="pw12345!",
-    )
-    client.force_login(user)
-
-    response = client.post("/accounts/logout/")
-
-    assert response.status_code == 302
-    assert response.headers["Location"] == "/"
+    assert response.status_code == 400
     assert client.get("/api/me/").status_code == 403
 
 

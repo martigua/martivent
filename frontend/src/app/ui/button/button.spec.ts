@@ -27,4 +27,24 @@ describe('Button', () => {
     const host = fixture.nativeElement as HTMLElement;
     expect(host.querySelector('button')?.className).toBe('secondary');
   });
+
+  it('forwards form behavior to its native button', async () => {
+    fixture.componentRef.setInput('type', 'submit');
+    fixture.componentRef.setInput('disabled', true);
+    await fixture.whenStable();
+
+    const button = (fixture.nativeElement as HTMLElement).querySelector('button');
+    expect(button?.type).toBe('submit');
+    expect(button?.disabled).toBe(true);
+  });
+
+  it('forwards disclosure semantics to its native button', async () => {
+    fixture.componentRef.setInput('ariaExpanded', true);
+    fixture.componentRef.setInput('ariaControls', 'navigation');
+    await fixture.whenStable();
+
+    const button = (fixture.nativeElement as HTMLElement).querySelector('button');
+    expect(button?.getAttribute('aria-expanded')).toBe('true');
+    expect(button?.getAttribute('aria-controls')).toBe('navigation');
+  });
 });

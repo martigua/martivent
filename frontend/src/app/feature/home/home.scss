@@ -3,11 +3,7 @@
 }
 
 .hero {
-  min-height: min(
-    var(--mg-home-hero-height, var(--hero-height)),
-    calc(100vh - var(--navigation-height))
-  );
-  padding-block: var(--mg-home-hero-padding, clamp(var(--space-16), 11vw, var(--space-32)));
+  padding-block: var(--mg-home-hero-padding, var(--page-padding-block));
 }
 
 .actions {
@@ -18,7 +14,7 @@
 }
 
 .foundation {
-  padding-block: var(--mg-home-section-padding, clamp(var(--space-12), 8vw, var(--space-24)));
+  padding-block: var(--mg-home-section-padding, var(--page-padding-block));
 }
 
 h2 {

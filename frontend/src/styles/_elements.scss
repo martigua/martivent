@@ -8,6 +8,7 @@ html {
   background: var(--surface-page);
   color: var(--text-primary);
   font-family: var(--font-body);
+  scrollbar-gutter: stable;
 }
 
 body {
@@ -45,5 +46,15 @@ a {
 @media (prefers-reduced-motion: no-preference) {
   html {
     scroll-behavior: smooth;
+  }
+
+  a {
+    transition:
+      color var(--motion-duration-fast) var(--motion-easing-standard),
+      opacity var(--motion-duration-fast) var(--motion-easing-standard);
+
+    &:active {
+      opacity: 0.72;
+    }
   }
 }

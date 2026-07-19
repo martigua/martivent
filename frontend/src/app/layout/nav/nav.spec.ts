@@ -1,8 +1,10 @@
 import { Component, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
+import { of } from 'rxjs';
 
 import { CurrentUser, SessionUser } from '../../core/current-user';
+import { HeadlessAuthentication } from '../../core/headless-authentication';
 import { Nav } from './nav';
 
 @Component({
@@ -23,12 +25,20 @@ describe('Nav', () => {
         provideRouter([
           { path: '', component: RouteTarget },
           { path: 'account', component: RouteTarget },
+          { path: 'auth/login', component: RouteTarget },
+          { path: 'auth/signup', component: RouteTarget },
         ]),
         {
           provide: CurrentUser,
           useValue: {
             user: session,
             loaded: signal(true),
+          },
+        },
+        {
+          provide: HeadlessAuthentication,
+          useValue: {
+            logout: () => of(undefined),
           },
         },
       ],
@@ -54,10 +64,11 @@ describe('Nav', () => {
     const nav = fixture.nativeElement as HTMLElement;
     const destinations = Array.from(nav.querySelectorAll('a'), (link) => link.getAttribute('href'));
 
-    expect(destinations).toContain('/accounts/login/');
-    expect(destinations).toContain('/accounts/signup/');
+    expect(destinations).toContain('/auth/login');
+    expect(destinations).toContain('/auth/signup');
     expect(destinations).not.toContain('/account');
-    expect(destinations).not.toContain('/accounts/logout/');
+    expect(nav.querySelector('mg-button:not(.menu-toggle)')).toBeNull();
+    expect(nav.querySelector('.session-actions')).toBeTruthy();
   });
 
   it('offers account access and logout to signed-in users', async () => {
@@ -74,9 +85,12 @@ describe('Nav', () => {
     const destinations = Array.from(nav.querySelectorAll('a'), (link) => link.getAttribute('href'));
 
     expect(destinations).toContain('/account');
-    expect(destinations).toContain('/accounts/logout/');
-    expect(destinations).not.toContain('/accounts/login/');
-    expect(destinations).not.toContain('/accounts/signup/');
+    const logout = Array.from(nav.querySelectorAll('mg-button')).find((button) =>
+      button.textContent.includes('Se déconnecter'),
+    );
+    expect(logout).toBeTruthy();
+    expect(destinations).not.toContain('/auth/login');
+    expect(destinations).not.toContain('/auth/signup');
   });
 
   it('marks the active home link semantically and visually', () => {
@@ -97,5 +111,20 @@ describe('Nav', () => {
 
     expect(nav.querySelector('.brand')?.classList).toContain('display-sm');
     expect(nav.querySelector('.links')?.classList).toContain('text-small');
+  });
+
+  it('exposes an accessible compact-navigation toggle', async () => {
+    const nav = fixture.nativeElement as HTMLElement;
+    const menu = nav.querySelector<HTMLButtonElement>('.menu-toggle button');
+    if (!menu) {
+      throw new Error('Navigation menu button not found');
+    }
+
+    expect(menu.getAttribute('aria-expanded')).toBe('false');
+    menu.click();
+    await fixture.whenStable();
+
+    expect(menu.getAttribute('aria-expanded')).toBe('true');
+    expect(nav.querySelector('.links')?.classList).toContain('open');
   });
 });

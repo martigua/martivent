@@ -1,3 +1,4 @@
+from django.views.decorators.csrf import ensure_csrf_cookie
 from drf_spectacular.utils import extend_schema
 from rest_framework import serializers
 from rest_framework.decorators import api_view, permission_classes
@@ -46,6 +47,7 @@ class ApplicationContextSerializer(serializers.Serializer):
     authentication = AuthenticationContextSerializer()
 
 
+@ensure_csrf_cookie
 @extend_schema(responses=ApplicationContextSerializer)
 @api_view(["GET"])
 @permission_classes([AllowAny])

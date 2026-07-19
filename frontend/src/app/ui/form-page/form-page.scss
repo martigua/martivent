@@ -1,0 +1,24 @@
+:host {
+  display: block;
+}
+
+section {
+  display: grid;
+  gap: var(--mg-form-page-gap, var(--space-8));
+  margin-inline: auto;
+  max-width: var(--mg-form-page-width, 34rem);
+  padding-block: var(--mg-form-page-padding-block, var(--page-padding-block));
+}
+
+.eyebrow {
+  color: var(--mg-form-page-eyebrow-color, var(--action-primary-background));
+  margin-bottom: var(--mg-form-page-eyebrow-gap, var(--space-3));
+}
+
+h1 {
+  font-size: var(--mg-form-page-title-size, var(--font-size-display-md));
+}
+
+.content {
+  min-width: 0;
+}

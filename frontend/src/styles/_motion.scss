@@ -1,0 +1,38 @@
+@keyframes mg-page-out {
+  to {
+    opacity: 0;
+    transform: translateY(calc(var(--motion-distance-page) * -1));
+  }
+}
+
+@keyframes mg-page-in {
+  from {
+    opacity: 0;
+    transform: translateY(var(--motion-distance-page));
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  ::view-transition-old(root),
+  ::view-transition-new(root),
+  ::view-transition-old(app-navigation),
+  ::view-transition-new(app-navigation) {
+    animation: none;
+  }
+
+  ::view-transition-old(app-page) {
+    animation: mg-page-out var(--motion-duration-fast) var(--motion-easing-standard) both;
+  }
+
+  ::view-transition-new(app-page) {
+    animation: mg-page-in var(--motion-duration-medium) var(--motion-easing-standard) both;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation-duration: 0.001ms;
+  }
+}

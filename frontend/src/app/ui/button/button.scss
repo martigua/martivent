@@ -7,10 +7,6 @@ button {
   font-weight: var(--mg-button-font-weight, var(--font-weight-bold));
   padding-block: var(--mg-button-padding-block, var(--space-3));
   padding-inline: var(--mg-button-padding-inline, var(--space-5));
-  transition:
-    background-color var(--motion-duration-fast) var(--motion-easing-standard),
-    border-color var(--motion-duration-fast) var(--motion-easing-standard),
-    color var(--motion-duration-fast) var(--motion-easing-standard);
 
   &.primary {
     background: var(--mg-button-background, var(--action-primary-background));
@@ -33,8 +29,45 @@ button {
     }
   }
 
+  &.link {
+    background: transparent;
+    border-color: transparent;
+    border-radius: 0;
+    color: var(--mg-button-color, var(--text-primary));
+    font-weight: var(--mg-button-font-weight, inherit);
+    padding: 0;
+
+    &:hover {
+      color: var(--mg-button-hover-color, var(--action-primary-background));
+    }
+  }
+
   &:focus-visible {
     outline: var(--focus-ring-width) solid var(--focus-ring-color);
     outline-offset: var(--focus-ring-offset);
+  }
+
+  &:disabled {
+    cursor: wait;
+    opacity: 0.65;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  button {
+    transition:
+      background-color var(--motion-duration-fast) var(--motion-easing-standard),
+      border-color var(--motion-duration-fast) var(--motion-easing-standard),
+      color var(--motion-duration-fast) var(--motion-easing-standard),
+      opacity var(--motion-duration-fast) var(--motion-easing-standard),
+      transform var(--motion-duration-fast) var(--motion-easing-standard);
+
+    &:hover:not(:disabled) {
+      transform: translateY(-1px);
+    }
+
+    &:active:not(:disabled) {
+      transform: translateY(0) scale(var(--motion-scale-press));
+    }
   }
 }

@@ -8,16 +8,20 @@
   display: block;
   position: sticky;
   top: 0;
+  view-transition-name: app-navigation;
   z-index: var(--mg-nav-layer, var(--layer-navigation));
 }
 
 nav {
   align-items: center;
   display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
   justify-content: space-between;
   margin: 0 auto;
   max-width: var(--mg-nav-content-width, var(--content-width));
   min-height: var(--mg-nav-height, var(--navigation-height));
+  padding-block: var(--space-3);
   padding-inline: var(--mg-nav-gutter, var(--content-gutter));
 }
 
@@ -30,15 +34,26 @@ a {
   color: var(--mg-nav-brand-color, var(--action-primary-background));
 }
 
+.menu-toggle {
+  display: block;
+  margin-inline-start: auto;
+}
+
 .links {
-  align-items: center;
-  display: flex;
+  align-items: flex-start;
+  display: none;
+  flex-basis: 100%;
+  flex-direction: column;
+  flex-wrap: wrap;
   font-weight: var(--mg-nav-link-weight, var(--font-weight-semibold));
-  gap: var(--mg-nav-link-gap, clamp(var(--space-3), 3vw, var(--space-8)));
+  gap: var(--mg-nav-link-gap, var(--navigation-gap));
+  padding-block: var(--space-3);
+
+  &.open {
+    display: flex;
+  }
 
   a {
-    transition: color var(--motion-duration-fast) var(--motion-easing-standard);
-
     &:hover,
     &:focus-visible,
     &.active {
@@ -55,31 +70,43 @@ a {
       text-decoration-thickness: var(--border-width-thin);
       text-underline-offset: var(--space-2);
     }
-
-    &.signup {
-      background: var(--action-primary-background);
-      border-radius: var(--radius-pill);
-      color: var(--action-primary-text);
-      padding: var(--space-2) var(--space-4);
-
-      &:hover,
-      &:focus-visible {
-        background: var(--action-primary-background-hover);
-        color: var(--action-primary-text);
-      }
-    }
   }
 }
 
-@media (max-width: breakpoints.$compact-navigation) {
+.session-actions {
+  align-items: flex-start;
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  gap: var(--mg-nav-link-gap, var(--navigation-gap));
+  justify-content: flex-start;
+  min-inline-size: 0;
+}
+
+@media (min-width: breakpoints.$navigation) {
   nav {
-    align-items: flex-start;
-    flex-direction: column;
-    gap: var(--space-2);
-    padding-block: var(--space-3);
+    align-items: center;
+    flex-wrap: nowrap;
+    gap: 0;
+    padding-block: 0;
+  }
+
+  .menu-toggle {
+    display: none;
   }
 
   .links {
-    flex-wrap: wrap;
+    align-items: center;
+    display: flex;
+    flex-basis: auto;
+    flex-direction: row;
+    padding-block: 0;
+  }
+
+  .session-actions {
+    align-items: center;
+    flex-direction: row;
+    justify-content: flex-end;
+    min-inline-size: var(--mg-nav-session-actions-width, 17rem);
   }
 }

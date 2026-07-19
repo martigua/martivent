@@ -1,19 +1,19 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
+import { Router, RouterLink } from '@angular/router';
+import { finalize } from 'rxjs';
 
 import { CurrentUser } from '../../core/current-user';
+import { HeadlessAuthentication, headlessErrorMessage } from '../../core/headless-authentication';
+import { Button } from '../../ui/button/button';
 import { Card } from '../../ui/card/card';
+import { FormPage } from '../../ui/form-page/form-page';
 import { Tag } from '../../ui/tag/tag';
 
 @Component({
   selector: 'app-account',
-  imports: [Card, Tag],
+  imports: [Button, Card, FormPage, RouterLink, Tag],
   template: `
-    <section class="account">
-      <header>
-        <p class="eyebrow">Espace personnel</p>
-        <h1>Mon compte</h1>
-      </header>
-
+    <mg-form-page eyebrow="Espace personnel" titleText="Mon compte">
       @if (!currentUser.loaded()) {
         <p role="status">Chargement de votre compte…</p>
       } @else if (currentUser.user(); as user) {
@@ -43,25 +43,53 @@ import { Tag } from '../../ui/tag/tag';
           }
 
           <nav class="actions" aria-label="Gestion du compte">
-            <a href="/accounts/email/">Gérer mon adresse email</a>
-            <a href="/accounts/password/change/">Changer mon mot de passe</a>
-            <a href="/accounts/logout/">Se déconnecter</a>
+            <a routerLink="/account/email">Gérer mes adresses email</a>
+            <a routerLink="/account/password">Changer mon mot de passe</a>
+            <mg-button variant="secondary" [disabled]="pending()" (click)="logout()">
+              Se déconnecter
+            </mg-button>
           </nav>
+          @if (errorMessage()) {
+            <p class="error" role="alert">{{ errorMessage() }}</p>
+          }
         </mg-card>
       } @else {
         <mg-card>
           <h2>Retrouvez votre espace personnel.</h2>
           <p>Connectez-vous pour consulter votre compte et son état de validation.</p>
           <nav class="actions" aria-label="Authentification">
-            <a href="/accounts/login/">Se connecter</a>
-            <a href="/accounts/signup/">Créer un compte</a>
+            <a routerLink="/auth/login">Se connecter</a>
+            <a routerLink="/auth/signup">Créer un compte</a>
           </nav>
         </mg-card>
       }
-    </section>
+    </mg-form-page>
   `,
   styleUrl: './account.scss',
 })
 export class Account {
+  private readonly authentication = inject(HeadlessAuthentication);
+  private readonly router = inject(Router);
+
   protected readonly currentUser = inject(CurrentUser);
+  protected readonly pending = signal(false);
+  protected readonly errorMessage = signal('');
+
+  protected logout(): void {
+    this.pending.set(true);
+    this.errorMessage.set('');
+    this.authentication
+      .logout()
+      .pipe(
+        finalize(() => {
+          this.pending.set(false);
+        }),
+      )
+      .subscribe({
+        next: () => void this.router.navigateByUrl('/'),
+        error: (error: unknown) => {
+          this.errorMessage.set(headlessErrorMessage(error));
+        },
+      });
+  }
 }

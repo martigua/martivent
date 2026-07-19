@@ -56,6 +56,15 @@ export default tseslint.config(
     },
   },
   {
+    files: ['**/*.routes.ts'],
+    rules: {
+      '@typescript-eslint/consistent-type-assertions': [
+        'error',
+        { assertionStyle: 'angle-bracket' },
+      ],
+    },
+  },
+  {
     files: ['**/*.html'],
     extends: [...angular.configs.templateRecommended, ...angular.configs.templateAccessibility],
     rules: {},

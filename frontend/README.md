@@ -22,9 +22,9 @@ The dev server is available at `http://localhost:4201/` and proxies `/api` and
 ```
 src/app/
   core/     singleton stores (ApplicationContext, CurrentUser)
+  feature/  business-facing components and their route definitions
   layout/   application shell (nav)
-  pages/    routed pages (home)
-  ui/       reusable presentational components (mg-*)
+  ui/       reusable presentational components without business logic (mg-*)
 src/styles/ global design tokens, element defaults, typography, breakpoints
 ```
 
@@ -32,14 +32,20 @@ src/styles/ global design tokens, element defaults, typography, breakpoints
   backend-owned data from `GET /api/context/`.
 - `core/CurrentUser` is the global session store for the user,
   administrator-validation state, capability sources, and evaluated feature
-  variants from `GET /api/me/`.
+  variants from `GET /api/me/`. An authentication failure represents the
+  normal signed-out state and does not prevent public pages from rendering.
 - Backend checks are authoritative. Frontend gates improve navigation and UX
   but never replace backend authorization.
-- The landing page is the only route and stays eager. Lazy-load a meaningful
-  route area when separation improves initial bundle size or route ownership;
-  keep small routes direct. `angular.json` enforces the initial-size budget.
-  Use `:id`, a nested `<router-outlet>`, and component input binding when a
-  feature has entity subpages.
+- Every routed business area lives under `feature/<name>/`, owns its local
+  route definition, and is lazy-loaded by `app.routes.ts`. Keep the root router
+  limited to feature entry points and application-wide fallbacks.
+- The `/account` feature remains reachable while signed out so it can offer
+  login and signup; while signed in it displays the email and
+  administrator-validation state. Django Allauth owns signup, login, logout,
+  password reset, and email management under `/accounts/`.
+- `angular.json` enforces the initial-size budget. Use `:id`, a nested
+  `<router-outlet>`, and component input binding when a feature has entity
+  subpages.
 - New forms use Angular Signal Forms.
 
 ## Dependencies

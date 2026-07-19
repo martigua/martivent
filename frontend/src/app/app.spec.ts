@@ -1,8 +1,9 @@
-import { Component, ViewEncapsulation } from '@angular/core';
+import { Component, ViewEncapsulation, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 
 import { App } from './app';
+import { CurrentUser } from './core/current-user';
 
 @Component({
   template: '',
@@ -15,7 +16,16 @@ describe('App', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [App, GlobalElements],
-      providers: [provideRouter([])],
+      providers: [
+        provideRouter([]),
+        {
+          provide: CurrentUser,
+          useValue: {
+            user: signal(null),
+            loaded: signal(true),
+          },
+        },
+      ],
     }).compileComponents();
   });
 

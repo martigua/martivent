@@ -1,0 +1,66 @@
+:host {
+  display: block;
+}
+
+.account {
+  margin-inline: auto;
+  max-width: 48rem;
+  padding-block: clamp(var(--space-12), 8vw, var(--space-24));
+}
+
+header {
+  margin-bottom: var(--space-8);
+}
+
+.eyebrow {
+  color: var(--action-primary-background);
+  margin-bottom: var(--space-3);
+}
+
+dl {
+  display: grid;
+  gap: var(--space-6);
+}
+
+dt {
+  color: var(--text-muted);
+  margin-bottom: var(--space-2);
+}
+
+dd {
+  font-size: var(--font-size-lg);
+}
+
+.explanation {
+  color: var(--text-muted);
+  margin-top: var(--space-6);
+  max-width: var(--measure-body);
+}
+
+h2 {
+  margin-bottom: var(--space-3);
+}
+
+.actions {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  margin-top: var(--space-8);
+
+  a {
+    color: var(--text-primary);
+    font-weight: var(--font-weight-semibold);
+    text-underline-offset: var(--space-2);
+
+    &:hover,
+    &:focus-visible {
+      color: var(--action-primary-background);
+    }
+
+    &:focus-visible {
+      outline: var(--focus-ring-width) solid var(--focus-ring-color);
+      outline-offset: var(--focus-ring-offset);
+    }
+  }
+}

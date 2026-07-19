@@ -16,11 +16,12 @@ Including another URLconf
 """
 
 from django.contrib import admin
-from django.urls import include, path
+from django.urls import include, path, re_path
 from drf_spectacular.views import SpectacularAPIView
 
 from .application_context import application_context_view
 from .health import healthz
+from .spa import spa_index
 
 admin.site.site_header = "Martivent"
 admin.site.site_title = "Martivent admin"
@@ -34,4 +35,9 @@ urlpatterns = [
     path("api/context/", application_context_view, name="application-context"),
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
     path("api/", include("accounts.urls")),
+    re_path(
+        r"^(?!(?:api|admin|accounts|_allauth|static|healthz)(?:/|$)).*$",
+        spa_index,
+        name="spa-index",
+    ),
 ]

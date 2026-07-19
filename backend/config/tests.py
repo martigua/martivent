@@ -1,5 +1,6 @@
 import json
 import os
+import re
 import subprocess
 import sys
 
@@ -90,6 +91,21 @@ def test_database_url_query_parameters_are_preserved():
     }
 
 
+@pytest.mark.parametrize(
+    ("debug", "expected"),
+    [
+        (True, False),
+        (False, True),
+    ],
+)
+def test_ssl_redirect_defaults_to_enabled_only_in_production(debug, expected):
+    assert make_env(debug=debug).ssl_redirect is expected
+
+
+def test_ssl_redirect_can_be_disabled_for_local_production_parity():
+    assert make_env(debug=False, secure_ssl_redirect=False).ssl_redirect is False
+
+
 @override_settings(
     ALLOWED_HOSTS=["martivent.example"],
     SECURE_PROXY_SSL_HEADER=("HTTP_X_FORWARDED_PROTO", "https"),
@@ -115,13 +131,13 @@ def test_proxy_security_settings_are_enabled():
 
 
 @pytest.mark.parametrize(
-    ("debug", "expected_secure"),
+    ("debug", "expected_secure", "expected_hsts"),
     [
-        ("true", False),
-        ("false", True),
+        ("true", False, 0),
+        ("false", True, 31_536_000),
     ],
 )
-def test_cookie_security_follows_debug_mode(debug, expected_secure):
+def test_browser_security_follows_debug_mode(debug, expected_secure, expected_hsts):
     process_environment = os.environ | {
         "SECRET_KEY": "test-secret",
         "DEBUG": debug,
@@ -139,7 +155,9 @@ def test_cookie_security_follows_debug_mode(debug, expected_secure):
                 "from django.conf import settings; "
                 "print(json.dumps({"
                 "'csrf': settings.CSRF_COOKIE_SECURE, "
-                "'session': settings.SESSION_COOKIE_SECURE"
+                "'session': settings.SESSION_COOKIE_SECURE, "
+                "'redirect': settings.SECURE_SSL_REDIRECT, "
+                "'hsts': settings.SECURE_HSTS_SECONDS"
                 "}))"
             ),
         ],
@@ -152,6 +170,8 @@ def test_cookie_security_follows_debug_mode(debug, expected_secure):
     assert json.loads(result.stdout) == {
         "csrf": expected_secure,
         "session": expected_secure,
+        "redirect": expected_secure,
+        "hsts": expected_hsts,
     }
 
 
@@ -191,3 +211,48 @@ def test_openapi_schema_available(client):
     response = client.get("/api/schema/")
 
     assert response.status_code == 200
+
+
+@pytest.fixture
+def spa_build(tmp_path, settings):
+    settings.WHITENOISE_ROOT = tmp_path
+    (tmp_path / "index.html").write_text(
+        "<!doctype html><title>Martivent production SPA</title>",
+        encoding="utf-8",
+    )
+
+
+def test_angular_deep_link_serves_the_spa_index(client, spa_build):
+    response = client.get("/auth/login")
+
+    assert response.status_code == 200
+    assert b"Martivent production SPA" in b"".join(response.streaming_content)
+
+
+def test_spa_fallback_does_not_swallow_unknown_api_routes(client, spa_build):
+    response = client.get("/api/not-found")
+
+    assert response.status_code == 404
+    assert b"Martivent production SPA" not in response.content
+
+
+def test_spa_fallback_is_404_when_the_frontend_build_is_absent(client, tmp_path, settings):
+    settings.WHITENOISE_ROOT = tmp_path
+
+    response = client.get("/auth/login")
+
+    assert response.status_code == 404
+
+
+@pytest.mark.parametrize(
+    "filename",
+    [
+        "admin/css/base.18f4a1c1a2b3.css",
+        "main-6CCCEU24.js",
+        "chunk-YJ7mtj4f.js",
+        "chunk-DFREX-64.js",
+        "chunk-CaTM_xNi.js",
+    ],
+)
+def test_compiled_assets_are_recognized_as_immutable(filename):
+    assert re.search(settings.WHITENOISE_IMMUTABLE_FILE_TEST, filename)

@@ -4,7 +4,9 @@ Read [README.md](README.md), then the README nearest to the code being changed.
 For backend work, [backend/README.md](backend/README.md) is the architecture and
 command reference.
 
-- Document current, working behavior only—never planned or removed behavior.
+- READMEs document current, working behavior only—never planned or removed
+  behavior. Approved delivery roadmaps live under `docs/superpowers/plans/`
+  and must keep their phase status current.
 - Follow KISS. Repeating a simple pattern twice is acceptable; apply DRY on the
   third only when the abstraction improves readability. Avoid premature
   abstraction and optimization.

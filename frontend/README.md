@@ -17,6 +17,11 @@ npm run format
 The dev server is available at `http://localhost:4201/` and proxies `/api`,
 `/_allauth`, and `/accounts` to Django in the same container.
 
+The production build is copied into Django's `spa/` directory by the root
+Dockerfile. Django then serves Angular routes and backend endpoints from the
+same origin; the standalone frontend development server is not used in
+production.
+
 ## Architecture
 
 ```

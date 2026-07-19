@@ -39,24 +39,25 @@ when its responsibility becomes part of the backend architecture.
 
 ## Applications
 
-| Application | Responsibility |
-| --- | --- |
-| `config` | Environment-backed settings, root URLs, health check, ASGI, and WSGI |
-| `accounts` | Email-based `User` model and the authenticated current-user API |
-| `access` | Roles, organizational groups, scoped grants, and authorization decisions |
-| `features` | Named feature variants and ordered audience rules |
+| Application | Responsibility                                                           |
+| ----------- | ------------------------------------------------------------------------ |
+| `config`    | Environment-backed settings, root URLs, health check, ASGI, and WSGI     |
+| `accounts`  | Email-based `User` model and the authenticated current-user API          |
+| `access`    | Roles, organizational groups, scoped grants, and authorization decisions |
+| `features`  | Named feature variants and ordered audience rules                        |
 
 ## HTTP surface
 
-| Path | Purpose |
-| --- | --- |
-| `GET /healthz` | Liveness check |
-| `/admin/` | Django administration |
-| `/_allauth/browser/v1/` | Browser-only Headless Allauth lifecycle API |
-| `/accounts/<provider>/` | Optional social-provider redirects and callbacks |
-| `GET /api/context/` | Public club, display-stat, authentication context, and anonymous CSRF-cookie seed |
-| `GET /api/schema/` | Generated OpenAPI schema |
-| `GET /api/me/` | Authenticated user, administrator-validation state, effective capabilities, and feature variants |
+| Path                    | Purpose                                                                                          |
+| ----------------------- | ------------------------------------------------------------------------------------------------ |
+| `GET /healthz`          | Liveness check                                                                                   |
+| `/admin/`               | Django administration                                                                            |
+| `/_allauth/browser/v1/` | Browser-only Headless Allauth lifecycle API                                                      |
+| `/accounts/<provider>/` | Optional social-provider redirects and callbacks                                                 |
+| `GET /api/context/`     | Public club, display-stat, authentication context, and anonymous CSRF-cookie seed                |
+| `GET /api/schema/`      | Generated OpenAPI schema                                                                         |
+| `GET /api/me/`          | Authenticated user, administrator-validation state, effective capabilities, and feature variants |
+| Other frontend paths    | Compiled Angular application in the production image                                             |
 
 Angular presents account forms while Allauth Headless owns signup, login,
 logout, password reset and change, email verification and management, social
@@ -102,20 +103,24 @@ It intentionally does not depend on Angular assets.
 required. Docker Compose supplies local values; the deployment platform
 supplies production values.
 
-| Variable | Meaning |
-| --- | --- |
-| `SECRET_KEY` | Django cryptographic signing secret |
-| `DEBUG` | Django debug mode |
-| `ALLOWED_HOSTS` | Comma-separated accepted host names |
-| `DATABASE_URL` | PostgreSQL connection URL |
-| `GOOGLE_CLIENT_ID` | Optional Google OAuth web client ID |
-| `GOOGLE_CLIENT_SECRET` | Optional Google OAuth web client secret |
+| Variable               | Meaning                                                             |
+| ---------------------- | ------------------------------------------------------------------- |
+| `SECRET_KEY`           | Django cryptographic signing secret                                 |
+| `DEBUG`                | Django debug mode                                                   |
+| `ALLOWED_HOSTS`        | Comma-separated accepted host names                                 |
+| `DATABASE_URL`         | PostgreSQL connection URL                                           |
+| `SECURE_SSL_REDIRECT`  | Optional HTTPS-redirect override for local production-parity and CI |
+| `GOOGLE_CLIENT_ID`     | Optional Google OAuth web client ID                                 |
+| `GOOGLE_CLIENT_SECRET` | Optional Google OAuth web client secret                             |
 
 There are intentionally no application defaults for the core values. Google
 login is disabled when both Google variables are absent or blank. Defining only
 one Google variable stops startup because the configuration is incomplete.
 Blank required strings also stop startup. Query parameters in `DATABASE_URL`,
 such as `sslmode=require`, are passed to PostgreSQL connection options.
+HTTPS redirect and one-year HSTS default to enabled when `DEBUG=false`.
+Production should keep that default. Local production-parity and CI explicitly
+set `SECURE_SSL_REDIRECT=false` because they are reached over plain HTTP.
 
 ## Google login
 
@@ -141,6 +146,10 @@ Railway overwrites the forwarded scheme and host headers before proxying to
 Django. The backend trusts those sanitized headers so OAuth callbacks retain
 their public HTTPS origin, and session and CSRF cookies are secure whenever
 debug mode is disabled.
+
+The production image serves compiled Angular files through WhiteNoise and
+routes Angular deep links to its index without swallowing `/api/`, `/admin/`,
+Allauth, static, or health-check URLs.
 
 ## Authorization
 

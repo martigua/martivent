@@ -14,6 +14,7 @@ class Env(BaseSettings):
     debug: bool
     allowed_hosts: str
     database_url: PostgresDsn
+    secure_ssl_redirect: bool | None = None
     google_client_id: str | None = None
     google_client_secret: str | None = None
 
@@ -48,6 +49,12 @@ class Env(BaseSettings):
     @property
     def google_enabled(self) -> bool:
         return self.google_client_id is not None
+
+    @property
+    def ssl_redirect(self) -> bool:
+        if self.secure_ssl_redirect is not None:
+            return self.secure_ssl_redirect
+        return not self.debug
 
     @property
     def hosts(self) -> list[str]:

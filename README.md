@@ -63,3 +63,17 @@ npm run build
 Stop with `docker compose -f docker-compose.dev.yml down`. Add `-v` only when
 you also want to delete every named development volume: PostgreSQL data and
 the Neovim plugin, state, and cache volumes.
+
+## Run the production image locally
+
+The root Dockerfile builds Angular, copies its compiled assets into Django,
+collects static files, and runs the same image used by CI and Railway:
+
+```bash
+docker compose up -d --build --wait
+```
+
+Open `http://localhost:8000/`. This production-parity stack applies migrations
+on startup and serves Angular and Django from one origin. Stop it with
+`docker compose down`; add `-v` only when you also want to delete its PostgreSQL
+data.

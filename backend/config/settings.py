@@ -32,6 +32,9 @@ ALLOWED_HOSTS = env.hosts
 # Railway sanitizes these forwarded headers before requests reach Django.
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
 USE_X_FORWARDED_HOST = True
+SECURE_SSL_REDIRECT = env.ssl_redirect
+SECURE_HSTS_SECONDS = 31_536_000 if SECURE_SSL_REDIRECT else 0
+SECURE_HSTS_INCLUDE_SUBDOMAINS = SECURE_SSL_REDIRECT
 SESSION_COOKIE_SECURE = not DEBUG
 CSRF_COOKIE_SECURE = not DEBUG
 
@@ -172,6 +175,9 @@ USE_TZ = True
 STATIC_URL = "static/"
 STATIC_ROOT = BASE_DIR / "staticfiles"
 STATICFILES_DIRS = [BASE_DIR / "static"]
+SPA_ROOT = BASE_DIR / "spa"
+WHITENOISE_ROOT = SPA_ROOT if SPA_ROOT.is_dir() else None
+WHITENOISE_IMMUTABLE_FILE_TEST = r"(?:\.[0-9a-f]{12}|-[A-Za-z0-9_-]{8})\."
 
 STORAGES = {
     "default": {
